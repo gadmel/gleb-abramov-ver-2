@@ -54,19 +54,17 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1'
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: 'iam.googleapis.com/projects/51022240282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
+          service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
+          audience: 'iam.googleapis.com/projects/51022240282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
+          token_format: 'access_token'
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
         with:
           version: '>= 363.0.0'
 
-      - name: 'Use Google Cloud SDK to authenticate'
-        run: |
-          gcloud auth login --brief --no-launch-browser --quiet
-          gcloud auth configure-docker --quiet
-
-      - name: 'Use  Google Cloud SDK to build and push image to Google Container Registry'
+      - name: 'Use Google Cloud SDK to build and push image to Google Container Registry'
         run: |
           gcloud builds submit --tag gcr.io/gleb-abramov/app --project gleb-abramov
 
