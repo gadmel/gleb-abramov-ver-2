@@ -12,13 +12,19 @@ jobs:
 
         steps:
         - uses: 'actions/checkout@v3'
+
         - id: 'auth'
           name: 'Authenticate to Google Cloud'
           uses: 'google-github-actions/auth@v1'
           with:
-            audience: 'workload-identity-pool'
-            workload_identity_provider: 'projects/510222405282/locations/global/workloadIdentityPools/workload-identity-pool/*'
+            workload_identity_provider: 'iam.googleapis.com/projects/510222405282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
             service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
+            token_url: 'https://sts.googleapis.com/v1/token'
+
+        - name: 'Set up Cloud SDK'
+          uses: 'google-github-actions/setup-gcloud@v1'
+          with:
+            version: '>= 363.0.0'
 
         - name: Run build script
           run: | 
