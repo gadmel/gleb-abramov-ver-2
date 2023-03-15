@@ -7,7 +7,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Run build script
-            run: chmod +x .github/scripts/build.sh && bash .github/scripts/build.sh
+            run: | 
+              chmod +x .github/scripts/build.sh  
+              bash .github/scripts/build.sh
             shell: bash
           - uses: actions/checkout@master
           - uses: actions/setup-node@v3
