@@ -19,7 +19,6 @@ jobs:
           with:
             workload_identity_provider: 'iam.googleapis.com/projects/510222405282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
             service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
-            token_url: 'https://sts.googleapis.com/v1/token'
 
         - name: 'Set up Cloud SDK'
           uses: 'google-github-actions/setup-gcloud@v1'
@@ -31,6 +30,14 @@ jobs:
            chmod +x "${GITHUB_WORKSPACE}/.github/scripts/build.sh"  
            bash "${GITHUB_WORKSPACE}/.github/scripts/build.sh"
            shell: bash
+        - id: 'deploy'
+          uses: 'google-github-actions/deploy-cloudrun@v1'
+          with:
+            service: 'app'
+            image: 'gcr.io/gleb-abramov/app'
+            region: 'europe-central2'
+            allow-unauthenticated: 'true'
+
         - uses: actions/checkout@master
         - uses: actions/setup-node@v3
         - uses: w9jds/setup-firebase@main
