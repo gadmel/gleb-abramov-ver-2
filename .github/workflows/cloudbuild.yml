@@ -4,9 +4,23 @@ name: Deploy to Google Cloud Hosting on merge
     branches:
       - main
 
-steps:
-  - name: 'gcr.io/cloud-builders/mvn'
-    args: ['install']
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--tag=gcr.io/gleb-abramov/app', '.']
-images: ['gcr.io/gleb-abramov/app']
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 19
+        uses: actions/setup-java@v3
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build with Maven
+        run: mvn -B package --file backend/pom.xml
+      - name: 'gcr.io/cloud-builders/mvn'
+        args: ['install']
+      - name: 'gcr.io/cloud-builders/docker'
+        args: ['build', '--tag=gcr.io/gleb-abramov/app', '.']
+        images: ['gcr.io/gleb-abramov/app']
