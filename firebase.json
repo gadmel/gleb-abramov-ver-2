@@ -5,12 +5,14 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [{
+    "rewrites": [
+      {
         "source": "**",
         "run": {
           "serviceId": "app",
           "region": "europe-central2"
         }
-      }]
+      }
+    ]
   }
 }
