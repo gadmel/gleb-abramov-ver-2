@@ -5,17 +5,21 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+
         permissions:
           contents: 'read'
           id-token: 'write'
+
         steps:
         - uses: 'actions/checkout@v3'
         - id: 'auth'
           name: 'Authenticate to Google Cloud'
           uses: 'google-github-actions/auth@v1'
           with:
+            token_format: 'access_token'
             workload_identity_provider: 'projects/510222405282/locations/global/workloadIdentityPools/workload-identity-pool/*'
             service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
+
         - name: Run build script
           run: | 
            chmod +x "${GITHUB_WORKSPACE}/.github/scripts/build.sh"  
