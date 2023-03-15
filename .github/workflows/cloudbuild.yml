@@ -63,6 +63,10 @@ jobs:
         with:
           version: '>= 363.0.0'
 
+      - name: 'Use gcloud CLI to build and push image to Google Container Registry'
+        run: |
+          gcloud builds submit --tag gcr.io/gleb-abramov/app --project gleb-abramov
+
       - id: 'deploy'
         uses: 'google-github-actions/deploy-cloudrun@v1'
         with:
