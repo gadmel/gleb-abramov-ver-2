@@ -2,21 +2,18 @@ name: Build and Deploy to Firebase Hosting on merge
 on:
   push:
     branches: [ "main" ]
-jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v3
-          - name: Run build script
-            run: | 
-              chmod +x "${GITHUB_WORKSPACE}/.github/scripts/build.sh"  
-              bash "${GITHUB_WORKSPACE}/.github/scripts/build.sh"
-            shell: bash
-          - uses: actions/checkout@master
-          - uses: actions/setup-node@v3
-          - uses: w9jds/setup-firebase@main
-            with:
-              tools-version: 11.9.0
-              firebase_token: ${{ secrets.FIREBASE_TOKEN }}
-          - run: firebase deploy --only hosting
-          - run: firebase deploy --only functions
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run build script
+        run: | 
+          chmod +x "${GITHUB_WORKSPACE}/.github/scripts/build.sh"  
+          bash "${GITHUB_WORKSPACE}/.github/scripts/build.sh"
+          shell: bash
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+      - uses: w9jds/setup-firebase@main
+        with:
+          tools-version: 11.9.0
+          firebase_token: ${{ secrets.FIREBASE_TOKEN }}
+      - run: firebase deploy --only hosting
+      - run: firebase deploy --only functions
