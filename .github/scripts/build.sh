@@ -1,4 +1,4 @@
-cd frontend || exit
+cd ../../frontend || exit
 npm ci
 npm run build
 rm -rf ../backend/src/main/resources/static
@@ -6,4 +6,4 @@ mv build ../backend/src/main/resources/static
 cd ../backend || exit
 ./mvnw clean package
 cd ..
-docker build -t gleb-abramov-com .
+gcloud builds submit --tag gcr.io/gleb-abramov/app
