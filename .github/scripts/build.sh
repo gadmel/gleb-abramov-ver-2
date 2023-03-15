@@ -6,5 +6,5 @@ mv build ../backend/src/main/resources/static
 cd ../backend || exit
 ./mvnw clean package
 cd ..
-gcloud builds submit --tag gcr.io/gleb-abramov/app --project gleb-abramov service=app
+gcloud builds submit --tag gcr.io/gleb-abramov/app --project gleb-abramov service app
 gcloud run deploy --image gcr.io/gleb-abramov/app --project gleb-abramov
