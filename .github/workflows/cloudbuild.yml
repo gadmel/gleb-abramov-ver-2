@@ -16,7 +16,7 @@ jobs:
           name: 'Authenticate to Google Cloud'
           uses: 'google-github-actions/auth@v1'
           with:
-            token_format: 'access_token'
+            audience: 'https://cloudbuild.googleapis.com/'
             workload_identity_provider: 'projects/510222405282/locations/global/workloadIdentityPools/workload-identity-pool/*'
             service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
 
