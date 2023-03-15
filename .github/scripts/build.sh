@@ -6,5 +6,6 @@ mv build ../backend/src/main/resources/static
 cd ../backend || exit
 ./mvnw clean package
 cd ..
-gcloud builds submit --tag gcr.io/gleb-abramov/app --project gleb-abramov --service=app
-gcloud run deploy --image gcr.io/gleb-abramov/app --project gleb-abramov
+gcloud builds submit --tag gcr.io/gleb-abramov/app --project gleb-abramov
+gcloud run deploy --image gcr.io/gleb-abramov/app --project gleb-abramov app --region europe-central2 --allow-unauthenticated
+
