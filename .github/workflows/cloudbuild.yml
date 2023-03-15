@@ -15,7 +15,7 @@ jobs:
           uses: 'google-github-actions/auth@v1'
           with:
             workload_identity_provider: 'projects/510222405282/locations/global/workloadIdentityPools/workload-identity-pool/*'
-            service_account: 'abramov.gleb@gmail.com'
+            service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
         - name: Run build script
           run: | 
            chmod +x "${GITHUB_WORKSPACE}/.github/scripts/build.sh"  
