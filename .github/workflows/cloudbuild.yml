@@ -3,13 +3,15 @@ on:
   push:
     branches:
       - master
-
-steps:
-  - uses: actions/checkout@master
-  - uses: actions/setup-node@v3
-  - uses: w9jds/setup-firebase@main
-    with:
-      tools-version: 11.9.0
-      firebase_token: ${{ secrets.FIREBASE_TOKEN }}
-  - run: firebase deploy --only hosting
-  - run: firebase deploy --only functions
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@master
+          - uses: actions/setup-node@v3
+          - uses: w9jds/setup-firebase@main
+            with:
+              tools-version: 11.9.0
+              firebase_token: ${{ secrets.FIREBASE_TOKEN }}
+          - run: firebase deploy --only hosting
+          - run: firebase deploy --only functions
