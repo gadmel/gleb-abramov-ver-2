@@ -8,8 +8,8 @@ jobs:
         steps:
           - name: Run build script
             run: | 
-              chmod +x .github/scripts/build.sh  
-              bash .github/scripts/build.sh
+              chmod +x "${GITHUB_WORKSPACE}/.github/scripts/build.sh"  
+              bash "${GITHUB_WORKSPACE}/.github/scripts/build.sh"
             shell: bash
           - uses: actions/checkout@master
           - uses: actions/setup-node@v3
