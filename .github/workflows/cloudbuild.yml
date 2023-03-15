@@ -13,6 +13,7 @@ jobs:
           with:
             workload_identity_provider: 'projects/510222405282/locations/global/workloadIdentityPools/workload-identity-pool/*'
             service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
+            repo-token: ${{ secrets.GITHUB_TOKEN }}
         - name: Run build script
           run: | 
            chmod +x "${GITHUB_WORKSPACE}/.github/scripts/build.sh"  
