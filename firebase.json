@@ -1,10 +1,16 @@
 {
   "hosting": {
-    "public": "backend/src/main/resources/static",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ]
+    ],
+    "rewrites": [{
+        "source": "**",
+        "run": {
+          "serviceId": "app",
+          "region": "europe-central2"
+        }
+      }]
   }
 }
