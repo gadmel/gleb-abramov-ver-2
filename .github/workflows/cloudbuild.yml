@@ -54,9 +54,7 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1'
         with:
-          workload_identity_provider: 'iam.googleapis.com/projects/51022240282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
-          service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
-          audience: 'iam.googleapis.com/projects/51022240282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
