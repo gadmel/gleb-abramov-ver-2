@@ -67,8 +67,7 @@ jobs:
 
       - name: 'Use Google Cloud SDK to build and push image to Google Container Registry'
         run: |
-          gcloud builds submit --config {
-          }/cloudbuild2.yml --project gleb-abramov
+          gcloud builds submit --config cloudbuild2.yml --project gleb-abramov
 
       - id: 'deploy'
         uses: 'google-github-actions/deploy-cloudrun@v1'
