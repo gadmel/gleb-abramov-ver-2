@@ -62,13 +62,6 @@ jobs:
           service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
           create_credentials_file: true
 
-      - id: 'deploy'
-        uses: 'google-github-actions/deploy-cloudrun@v1'
-        with:
-          service: 'app'
-          image: 'gcr.io/gleb-abramov/app'
-          region: 'europe-central2'
-          allow-unauthenticated: 'true'
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
       - uses: w9jds/setup-firebase@main
