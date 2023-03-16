@@ -59,12 +59,14 @@ jobs:
           service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
           create_credentials_file: true
           activate_credentials_file: true
+          audience: 'https://cloudbuild.googleapis.com/google.devtools.cloudbuild.v1.CloudBuild'
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
 
       - name: 'Use Google Cloud SDK to build and push image to Google Container Registry'
         run: |
+          gcliud
           gcloud builds submit --tag gcr.io/gleb-abramov/app --project gleb-abramov
 
       - id: 'deploy'
