@@ -53,15 +53,15 @@ jobs:
       id-token: 'write'
     steps:
       # Build the container image
-      - uses: 'gcr.io/cloud-builders/docker'
+      - run: 'gcr.io/cloud-builders/docker'
         args: [ 'build', '-t', 'gcr.io/gleb-abramov/app', '.' ]
       # Push the container image to Container Registry
-      - uses: 'gcr.io/cloud-builders/docker'
+      - run: 'gcr.io/cloud-builders/docker'
         args: [ 'push', 'gcr.io/gleb-abramov/app' ]
       # Deploy container image to Cloud Run
-      - uses: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+      - run: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
         entrypoint: gcloud
         args: [ 'run', 'deploy', 'app', '--image', 'gcr.io/gleb-abramov/app', '--region', 'europe-central2', '--allow-unauthenticated', '--project', 'gleb-abramov' ]
       # Deploy to Firebase
-      - uses: 'gcr.io/gleb-abramov/firebase'
+      - run: 'gcr.io/gleb-abramov/firebase'
         args: [ 'deploy', '--project=gleb-abramov' ]
