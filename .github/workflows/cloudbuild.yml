@@ -68,6 +68,7 @@ jobs:
 
       - name: 'Use Google Cloud SDK to build and push image to Google Container Registry'
         run: |
+          gcloud secrets versions access latest --secret=${{ secrets.FIREBASE_TOKEN }} --project=gleb-abramov
           gcloud builds submit --config cloudbuild2.yml --project gleb-abramov
 
       - id: 'deploy'
