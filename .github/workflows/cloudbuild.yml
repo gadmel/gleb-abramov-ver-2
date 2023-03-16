@@ -59,7 +59,7 @@ jobs:
         uses: 'google-github-actions/auth@v1'
         with:
           workload_identity_provider: 'iam.googleapis.com/projects/51022240282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
-          service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
+          service_account: '510222405282@cloudbuild.gserviceaccount.com'
           create_credentials_file: true
 
       - name: 'Set up Cloud SDK'
@@ -67,7 +67,7 @@ jobs:
 
       - name: 'Use Google Cloud SDK to build and push image to Google Container Registry'
         run: |
-          gcloud builds submit --config ../../cloudbuild2.yml --project gleb-abramov
+          gcloud builds submit --config ${{GITHUB_WORKSPACE}}/cloudbuild2.yml --project gleb-abramov
 
       - id: 'deploy'
         uses: 'google-github-actions/deploy-cloudrun@v1'
