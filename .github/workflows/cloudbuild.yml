@@ -57,7 +57,6 @@ jobs:
         with:
           workload_identity_provider: 'iam.googleapis.com/projects/51022240282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
           service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
-          audience: 'iam.googleapis.com/projects/51022240282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
