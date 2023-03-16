@@ -53,35 +53,16 @@ jobs:
       id-token: 'write'
     steps:
       - uses: 'actions/checkout@v3'
-
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          workload_identity_provider: 'iam.googleapis.com/projects/51022240282/locations/global/workloadIdentityPools/workload-identity-pool/providers/provider-id-1'
-          service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
-          create_credentials_file: true
-
-      - uses: 'gcr.io/cloud-builders/docker'
-        args: [ 'build', '-tag', 'gcr.io/gleb-abramov/app', '.' ]
-        images:
-        - 'gcr.io/gleb-abramov/app'
-        env:
-          CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: ${{ steps.auth.outputs.credentials_file }}
-
-      - id: 'deploy'
-        uses: 'google-github-actions/deploy-cloudrun@v1'
-        with:
-          service: 'app'
-          image: 'gcr.io/gleb-abramov/app'
-          region: 'europe-central2'
-          allow-unauthenticated: 'true'
-
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
-      - uses: w9jds/setup-firebase@main
-        with:
-          tools-version: 11.9.0
-          firebase_token: ${{ secrets.FIREBASE_TOKEN }}
-      - run: firebase deploy --only hosting
-      - run: firebase deploy --only functions
+      # Build the container image
+      - name: 'gcr.io/cloud-builders/docker'
+        args: ['build', '-t', 'gcr.io/gleb-abramov/app', '.']
+      # Push the container image to Container Registry
+      - name: 'gcr.io/cloud-builders/docker'
+        args: ['push', 'gcr.io/gleb-abramov/app']
+      # Deploy container image to Cloud Run
+      - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+        entrypoint: gcloud
+        args: ['run', 'deploy', 'app', '--image', 'gcr.io/gleb-abramov/app', '--region', 'europe-central2', '--allow-unauthenticated', '--project', 'gleb-abramov']
+      # Deploy to Firebase
+      - name: 'gcr.io/gleb-abramov/firebase'
+        args: [ 'deploy', '--project=gleb-abramov' ]
