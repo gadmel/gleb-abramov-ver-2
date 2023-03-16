@@ -62,7 +62,7 @@ jobs:
           service_account: 'github-cloudbuild@gleb-abramov.iam.gserviceaccount.com'
           create_credentials_file: true
 
-      - name: 'gcr.io/cloud-builders/docker'
+      - uses: 'gcr.io/cloud-builders/docker'
         args: [ 'build', '-tag', 'gcr.io/gleb-abramov/app', '.' ]
         images:
         - 'gcr.io/gleb-abramov/app'
