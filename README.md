@@ -1,3 +1,5 @@
+# [gleb-abramov.com](https://gleb-abramov.com)
+
 ## Introduction
 
 This is the repository of the capstone project of the [Java Development Bootcamp](https://www.neuefische.de/bootcamp/java-development) by [neuefische](https://www.neuefische.de/) created by [Gleb Abramov](https://github.com/gadmel).<br>
@@ -69,7 +71,7 @@ If it doesn't work, try to run the following command:
 ```bash
 chmod +x ./.github/scripts/docker.sh
 ```
-THe `docker.sh` script will build a Docker container of the project and tag it with the name `gleb-abramov`.
+The `docker.sh` script will build a Docker container of the project and tag it with the name `gleb-abramov`.
 
 Once the container is built, you can access the application by navigating to [localhost:3000](localhost:3000) in your web browser.
 
