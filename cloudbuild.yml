@@ -12,4 +12,3 @@ steps:
   # Deploy to Firebase
   - name: 'gcr.io/gleb-abramov/firebase'
     args: [ 'deploy', '--project=gleb-abramov' ]
-

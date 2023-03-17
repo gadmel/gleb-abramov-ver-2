@@ -10,9 +10,9 @@ public class BackendApplication {
 
 	@RestController
 	class HelloworldController {
-		@GetMapping("/")
+		@GetMapping("/api/")
 		String hello() {
-			return "Hello, World!";
+			return "Hello, world. It's me again, Gleb!";
 		}
 	}
 
