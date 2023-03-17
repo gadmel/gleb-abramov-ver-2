@@ -12,8 +12,9 @@ steps:
       mv frontend/dist backend/src/main/resources/static
   # Execute mvn clean install
   - name: maven
+    entrypoint: mvn
     args: ['clean', 'install']
-    dir: 'backend' 
+    dir: 'backend'
   # Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
     args: ['package']
