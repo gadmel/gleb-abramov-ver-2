@@ -10,10 +10,6 @@ steps:
   - name: bash
     script: |
       mv frontend/dist backend/src/main/resources/static
-  # Execute mvn clean install
-  - name: 'gcr.io/cloud-builders/mvn'
-    args: ['clean', 'install']
-    dir: 'backend'
   # Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
     args: ['package']
