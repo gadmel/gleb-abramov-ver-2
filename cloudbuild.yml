@@ -41,7 +41,6 @@ steps:
     name: 'gcr.io/gleb-abramov/sonar-scanner'
     args:
       - 'sonar-scanner'
-      - '-Dsonar.host.url=https://sonarcloud.io'
       - '-Dsonar.organization=gadmel'
       - '-Dsonar.projectKey=gadmel_gleb-abramov-ver-2_backend'
       - '-Dsonar.login={{secrets.SONAR_TOKEN}}'
