@@ -62,7 +62,8 @@ npm install --global typescript
 ```
 ## Usage
 
-This project includes a bash script located in the .github/scripts directory that can be used to build a Docker container of the project locally.<br>
+This project includes a bash script located in the `.github/script` directory that can be used to build a Docker container of the project locally.
+
 To run this script, open Terminal, navigate to the root directory of the project, and run the following command:
 ```bash
 cd ./.github/scripts && ./docker.sh && cd ../..
