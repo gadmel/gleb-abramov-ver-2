@@ -1,7 +1,7 @@
 steps:
   # Download and cache dependencies
   - name: 'gcr.io/cloud-builders/mvn'
-    args: ['verify', '--file', 'backend/pom.xml']
+    args: ['dependency:go-offline', '--file', 'backend/pom.xml']
   # Build frontend
   - name: 'gcr.io/cloud-builders/npm'
     args: ['install', '--prefix', 'frontend' './frontend']
