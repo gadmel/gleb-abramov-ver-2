@@ -8,7 +8,7 @@ steps:
     dir: 'frontend'
   # Move dist directory to backend static directory
   - name: 'gcr.io/cloud-builders/mv'
-    args: ['frontend/dist', 'backend/src/main/resources/static']
+    args: ['dist', 'backend/src/main/resources/static']
   # Execute mvn clean install
   - name: 'gcr.io/cloud-builders/mvn'
     args: ['clean', 'install']
