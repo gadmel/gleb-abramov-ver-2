@@ -30,6 +30,15 @@ steps:
   - name: 'gcr.io/cloud-builders/mvn'
     args: ['package']
     dir: 'backend'
+  - id: Sonar Analysis
+    name: 'gcr.io/gleb-abramov/sonar-scanner'
+    args:
+      - 'sonar-scanner'
+      - '-Dsonar.host.url=https://sonarcloud.io'
+      - '-Dsonar.organization=gadmel'
+      - '-Dsonar.projectKey=gadmel_gleb-abramov-ver-2_backend'
+      - '-Dsonar.file=backend/pom.xml'
+      - '-Dsonar.login=$SONAR_TOKEN'
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/gleb-abramov/app', '.']
