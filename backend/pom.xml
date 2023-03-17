@@ -14,7 +14,7 @@
 	<name>backend</name>
 	<description>backend</description>
 	<properties>
-		<java.version>8</java.version>
+		<java.version>18</java.version>
 		<sonar.organization>gadmel</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.coverage.exclusions>**/StaticFilesConfig.java</sonar.coverage.exclusions>

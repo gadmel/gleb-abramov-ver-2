@@ -12,7 +12,7 @@ public class BackendApplication {
 	class HelloworldController {
 		@GetMapping("/api/")
 		String hello() {
-			return "Hello, world. It's me again, Gleb!";
+			return "Hello, world. It's me again - Gleb!";
 		}
 	}
 
