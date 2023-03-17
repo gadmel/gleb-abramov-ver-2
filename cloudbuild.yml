@@ -13,7 +13,7 @@ steps:
   # Frontend: Execute npm install and run build
   - name: 'gcr.io/cloud-builders/npm'
     id: Install node modules
-    args: ['clean', 'install']
+    args: ['install']
     dir: 'frontend'
     
   - name: 'gcr.io/cloud-builders/npm'
