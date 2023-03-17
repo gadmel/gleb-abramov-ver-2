@@ -1,4 +1,6 @@
 steps:
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['install']
   # Build Java with Maven
   - name: 'gcr.io/cloud-builders/mvn'
     args: ['package', '--file', 'backend/pom.xml']
