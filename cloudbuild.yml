@@ -1,5 +1,5 @@
 steps:
-  # Go to frontend execute npm install and run build
+  # Frontend: Execute npm install and run build
   - name: 'gcr.io/cloud-builders/npm'
     args: ['install']
     dir: 'frontend'
@@ -10,12 +10,12 @@ steps:
   - name: bash
     script: |
       mv frontend/dist backend/src/main/resources/static
-  # Execute mvn clean install
+  # Backend: Execute mvn clean install
   - name: 'gcr.io/cloud-builders/mvn'
     entrypoint: mvn
     args: ['install']
     dir: 'backend'
-  # Execute mvn package
+  # Backend: Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
     args: ['package']
     dir: 'backend'
