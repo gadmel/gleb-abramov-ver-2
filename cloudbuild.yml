@@ -39,7 +39,7 @@ steps:
   # Sonar Analysis - Backend
   - id: Sonar Analysis - Backend
     name: 'gcr.io/gleb-abramov/sonar-scanner'
-    args: [ 'sonar-scanner', '-Dsonar.projectKey=gadmel_gleb-abramov-ver-2_backend', '-Dsonar.login=$SONAR_TOKEN', '-Dsonar.organization=gadmel' ]
+    args: [ 'sonar-scanner', '-Dsonar.projectKey=gadmel_gleb-abramov-ver-2_backend', '-Dsonar.login=${{secret.SONAR_TOKEN}}', '-Dsonar.organization=gadmel' ]
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/gleb-abramov/app', '.']
