@@ -1,7 +1,18 @@
 steps:
-  # Go to frontend execute build and move dist directory to backend static directory
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['run', '-v', '/workspace:/workspace', '-w', '/workspace/frontend', 'node:16', 'npm', 'run', 'build']
+  # Go to frontend execute npm install and run build and move dist directory to backend static directory
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+    dir: 'frontend'
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+    dir: 'frontend'
+  - name: 'gcr.io/cloud-builders/cp'
+    args: ['-r', 'frontend/dist', 'backend/src/main/resources/static']
+    dir: 'frontend'
+  # Go to backend execute mvn clean install
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['clean', 'install']
+    dir: 'backend'
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/gleb-abramov/app', '.']
