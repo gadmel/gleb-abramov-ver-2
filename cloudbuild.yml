@@ -1,0 +1,58 @@
+# This action is triggered by a push to main branch Google Cloud Build trigger, which is configured in the Google Cloud Console. See https://cloud.google.com/build/docs/automating-builds/create-github-app-triggers
+# This particular action is also configured to deploy to a Firebase project's hosting service. See the full instructions on how to set up a Firebase project and deploy to it from Google Cloud Build as a Docker container. See https://cloud.google.com/build/docs/deploying-builds/deploy-firebase
+
+# You will need to create a Firebase project and configure it to use the hosting service. See https://firebase.google.com/docs/hosting/quickstart
+# And you will need to create a Google Cloud Platform project associated with the GitHub repository  and configure it to use the Cloud Run service. See https://cloud.google.com/run/docs/quickstarts/build-and-deploy
+# Also to create a service account in the Firebase project and generate a JSON key file for it. Then, you need to create a secret in the GitHub repository named FIREBASE_TOKEN and set its value to the JSON key file. See https://firebase.google.com/docs/cli#cli-ci-systems
+# To authorise the Google Cloud SDK to deploy to Cloud Run, you will need to create a service account in the Google Cloud Platform project and set up a trigger in the Google Cloud Console to deploy to Cloud Run. See https://cloud.google.com/run/docs/quickstarts/build-and-deploy#authenticating
+# To set up the trigger in the Google Cloud Console, department of Cloud Build, select Triggers, and then click Create Trigger. See https://cloud.google.com/build/docs/automating-builds/create-github-app-triggers
+
+# Enjoy the power of Google Cloud Build, Firebase containerised deployment and GitHub Actions!
+
+steps:
+  # Frontend: Execute npm install and run build
+  - name: 'gcr.io/cloud-builders/npm'
+    id: Install node modules
+    args: ['install']
+    dir: 'frontend'
+    
+  - name: 'gcr.io/cloud-builders/npm'
+    id: Build frontend
+    args: ['run', 'build']
+    dir: 'frontend'
+  # Move dist directory to backend static directory
+  - name: bash
+    id: Move dist directory to backend static directory
+    script: |
+      mv frontend/dist backend/src/main/resources/static
+  # Backend: Execute mvn clean install
+  - name: 'gcr.io/cloud-builders/mvn'
+    id: 'Backend: Execute mvn clean install'
+    entrypoint: mvn
+    args: ['install']
+    dir: 'backend'
+  # Backend: Execute mvn package
+  - name: 'gcr.io/cloud-builders/mvn'
+    id: 'Backend: Execute mvn package'
+    args: ['package']
+    dir: 'backend'
+  # Build the Docker container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/gleb-abramov/app', '.']
+    id: Build the Docker container image
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/gleb-abramov/app']
+    id: Push the container image to Google Container Registry
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'app', '--image', 'gcr.io/gleb-abramov/app', '--region', 'europe-central2', '--allow-unauthenticated', '--project', 'gleb-abramov']
+    id: Deploy container image to Google Cloud Run
+  # Deploy to Firebase
+  - name: 'gcr.io/gleb-abramov/firebase'
+    args: [ 'deploy', '--project=gleb-abramov' ]
+    id: Deploy to Firebase
+options:
+  logging: CLOUD_LOGGING_ONLY
+
