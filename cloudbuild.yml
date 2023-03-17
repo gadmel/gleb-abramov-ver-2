@@ -45,7 +45,7 @@ steps:
       - '-Dsonar.projectKey=gadmel_gleb-abramov-ver-2_backend'
       - '-Dsonar.login={{secrets.SONAR_TOKEN}}'
   # Build the Docker container image
-
+  # Comment
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/gleb-abramov/app', '.']
     id: Build the Docker container image
