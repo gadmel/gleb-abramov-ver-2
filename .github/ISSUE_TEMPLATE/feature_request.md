@@ -1,12 +1,3 @@
----
-name: Feature request
-about: Suggest a user story for this project
-title: As a ..., I want to ..., so I can ...
-labels: ''
-assignees: gadmel
-
----
-
 # User story
 As a ..., I want to ..., so I can ...
 
