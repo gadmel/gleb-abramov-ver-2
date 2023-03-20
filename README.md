@@ -17,9 +17,9 @@ This is achieved by configuring the project for deployment using [Google Cloud B
 
 Before using this project, you need to install the following dependencies:
 ### Backend Dependencies
+- [Homebrew](https://brew.sh/)
 - JDK 17
 - Maven
-- Homebrew
 - Docker
 
 ### Frontend Dependencies 
@@ -57,8 +57,8 @@ To install Node, React, Vite, and Typescript, open Terminal and run the followin
 ```bash
 brew install node
 npm install --global create-react-app
-npm install --global vite
-npm install --global typescript
+brew install vite
+brew install typescript
 ```
 ## Usage
 
@@ -66,21 +66,20 @@ This project includes a bash script located in the `.github/script` directory th
 
 To run this script, open Terminal, navigate to the root directory of the project, and run the following command:
 ```bash
+chmod +x ./.github/scripts/build.sh
+chmod +x ./.github/scripts/docker.sh
 cd ./.github/scripts && ./docker.sh && cd ../..
 ```
-If it doesn't work, try to run the following command:
-```bash
-chmod +x ./.github/scripts/docker.sh
-```
+
 The `docker.sh` script will build a Docker container of the project and tag it with the name `gleb-abramov`.
 
 Once the container is built, you can access the application by navigating to [localhost:3000](localhost:3000) in your web browser.
 
-Please note that this project is configured for deployment using Google Cloud Build and Google Container Registry, and it's not recommended to use the deploy.sh script directly.
+Please note that this project is configured for deployment using Google Cloud Build and Google Container Registry, and it's not recommended to use the `deploy.sh` script directly.
 
-Instead, we recommend following the instructions in the cloudbuild.yml file to set up a Cloud Build trigger that will build a container image of the project and push it to Google Container Registry. The `firebase.json` file can be used to deploy the application to Firebase Hosting. 
+Instead, we recommend following the instructions in the `cloudbuild.yml` file to set up a Cloud Build trigger that will build a container image of the project and push it to Google Container Registry. The `firebase.json` file can be used to deploy the application to Firebase Hosting. 
 
-Please see the comments in the cloudbuild.yml file for more information and links to helpful resources on containerizing and deploying Java applications with Google Cloud Build and Firebase Hosting.
+Please see the comments in the `cloudbuild.yml` file for more information and links to helpful resources on containerizing and deploying Java applications with Google Cloud Build and Firebase Hosting.
 ## Conclusion
 
 I hope this readme has provided you with all the necessary information to install the dependencies and use the bash script to build a Docker container of the project locally. If you have any questions or issues, please don't hesitate to contact me. Thank you for checking out my capstone project!
