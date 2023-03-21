@@ -1,0 +1,73 @@
+@import "variables";
+
+:root {
+	font-family: "JetBrains Mono", monospace, -apple-system, BlinkMacSystemFont, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+
+	color-scheme: light dark;
+	color: $font-color;
+	background-color: $background;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+}
+
+#root {
+	width: 100%;
+}
+
+a {
+	font-weight: 500;
+	color: $anchor--font-color;
+	text-decoration: inherit;
+}
+
+a:hover {
+	color: $anchor--font-color--hover
+}
+
+body {
+	margin: 0;
+	display: flex;
+	place-items: center;
+	min-width: 320px;
+	min-height: 100vh;
+}
+
+button {
+	border-radius: 8px;
+	border: 1px solid transparent;
+	padding: 0.6em 1.2em;
+	font-size: calc(0.6em + 0.8vw);
+	font-weight: 500;
+	font-family: inherit;
+	background-color: $button--background;
+	cursor: pointer;
+	transition: border-color 0.25s;
+}
+
+button:hover {
+	border-color: $button--border--hover;
+}
+
+button:focus,
+button:focus-visible {
+	outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		color: $font-color--light;
+		background-color: $background--light;
+	}
+	a:hover {
+		color: $anchor--font-color--hover--light
+	}
+	button {
+		background-color: $button--background--light;
+	}
+}

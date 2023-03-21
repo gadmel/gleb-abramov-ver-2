@@ -1,0 +1,150 @@
+@import "../../sass/variables";
+
+.main {
+
+	section {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+
+		& div.full-screen-unit {
+			display: flex;
+			flex-direction: column;
+			max-width: 1280px;
+			min-height: 100vh;
+			margin: auto auto;
+			align-items: center;
+			text-align: center;
+			justify-content: center;
+			padding: calc(1em + 2vw);
+			gap: 1.6em;
+
+			& p {
+				margin-block: 0;
+			}
+		}
+
+		& .avatar--wrapper {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			max-width: calc(8em + 8vw);
+		}
+
+		& .avatar {
+			width: 100%;
+			max-width: calc(28em + 10vw);
+			border-radius: calc(0.5em + 1vw);
+			box-shadow: 0 0 calc(2em + 20vw) $avatar--shadow;
+			@media (prefers-color-scheme: light) {
+				box-shadow: 0 0 calc(2em + 20vw) $avatar--shadow--light;
+			}
+
+		}
+
+		& .greetings {
+			font-size: calc(0.6em + 1vw);
+			line-height: 1.1;
+		}
+
+		& .name {
+			font-size: calc(1.4em + 1.2vw);
+			line-height: 1.1;
+		}
+
+		& .job-title {
+			font-size: calc(0.8em + 0.8vw);
+			line-height: 1.1;
+		}
+
+
+		& .statement {
+			font-size: calc(0.8em + 0.8vw);
+			line-height: 1.1;
+		}
+
+		& .extension {
+			font-size: calc(0.8em + 0.6vw);
+			line-height: 1.1;
+		}
+
+		& .conclusion {
+			font-size: calc(1em + 1vw);
+			line-height: 1.1;
+			margin-bottom: 1.2em;
+		}
+
+		& span.stack {
+			font-size: calc(0.6em + 0.5vw);
+			line-height: 0.9;
+			color: $font-color--stack;
+			@media (prefers-color-scheme: light) {
+				color: $font-color--stack--light
+			}
+		}
+
+		& > div > p:last-of-type {
+			margin-bottom: calc(2em + 12vw) !important;
+		}
+
+	}
+
+	#details {
+		background: $background--personal;
+		@media (prefers-color-scheme: light) {
+			background-image: linear-gradient(
+					40deg,
+					hsl(212deg 59% 80%) 0%,
+					hsl(212deg 54% 81%) 32%,
+					hsl(213deg 49% 82%) 51%,
+					hsl(213deg 44% 82%) 65%,
+					hsl(213deg 38% 83%) 76%,
+					hsl(213deg 31% 84%) 84%,
+					hsl(214deg 25% 85%) 90%,
+					hsl(214deg 17% 85%) 94%,
+					hsl(214deg 9% 86%) 98%,
+					hsl(0deg 0% 87%) 100%
+			);
+			color: $font-color--personal--light;
+		}
+	}
+
+	#details2 {
+		background: $background--technical;
+		@media (prefers-color-scheme: light) {
+			background-image: linear-gradient(
+					340deg,
+					hsl(91deg 84% 10%) 0%,
+					hsl(90deg 45% 17%) 13%,
+					hsl(87deg 32% 23%) 17%,
+					hsl(83deg 24% 30%) 21%,
+					hsl(79deg 19% 37%) 27%,
+					hsl(74deg 15% 44%) 36%,
+					hsl(69deg 13% 52%) 47%,
+					hsl(63deg 15% 59%) 61%,
+					hsl(57deg 18% 67%) 79%,
+					hsl(51deg 26% 76%) 100%
+			);
+			color: $font-color--technical--light;
+			font-weight: bold;
+		}
+	}
+
+	.button--welcome {
+		position: sticky;
+		bottom: calc(2em + 5vh);
+		left: 25%;
+		width: 50%;
+		margin-bottom: 4em;
+	}
+
+	.button--go-on,
+	.button--scroll-up {
+		position: sticky;
+		bottom: calc(0em + 5vh);
+		left: 25%;
+		width: 50%;
+		margin-bottom: 2em;
+	}
+
+}
