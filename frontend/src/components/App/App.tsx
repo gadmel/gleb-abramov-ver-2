@@ -2,6 +2,7 @@ import React from 'react'
 import {Route, Routes} from 'react-router-dom'
 
 import LandingPage from "../LandingPage/LandingPage";
+import LegalNotice from "../LegalNotice/LegalNotice";
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
 			<main className="main">
 				<Routes>
 					<Route path="/" element={<LandingPage/>}/>
+					<Route path="/legal" element={<LegalNotice/>}/>
 				</Routes>
 			</main>
 		</div>
