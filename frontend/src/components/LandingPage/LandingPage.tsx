@@ -1,5 +1,6 @@
 import React, {useRef} from "react";
 
+import Layout from "../Layout/Layout";
 import glebAbramov from "../../assets/gleb_photo_squared.jpg";
 
 function LandingPage() {
@@ -13,7 +14,7 @@ function LandingPage() {
 	}
 
 	return (
-		<>
+		<Layout>
 			<section id="summary" ref={summaryRef}>
 				<div className="full-screen-unit">
 					<div className="avatar--wrapper">
@@ -75,8 +76,7 @@ function LandingPage() {
 
 				</div>
 			</section>
-
-		</>
+		</Layout>
 	)
 }
 
