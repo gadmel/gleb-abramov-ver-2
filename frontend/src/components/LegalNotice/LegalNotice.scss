@@ -46,6 +46,7 @@ main > section#legal-notice {
 
 	& p.value {
 		color: $font-color--legal--value;
+		font-size: calc(0.8em + 0.5vw);
 		@media (prefers-color-scheme: light) {
 			color: $font-color--legal--value--light;
 		}
@@ -53,11 +54,11 @@ main > section#legal-notice {
 
 	& p.notice {
 		color: $font-color--legal--notice;
+		font-size: calc(0.6em + 0.8vw);
+		line-height: 1;
 		@media (prefers-color-scheme: light) {
 			color: $font-color--legal--notice--light;
 		}
-		font-size: calc(0.6em + 0.8vw);
-		line-height: 1;
 	}
 
 }
