@@ -1,19 +1,13 @@
 import React, {useRef} from 'react'
 
-import axios from "axios";
-
 import glebAbramov from '../../assets/gleb_photo_squared.jpg'
 
 function App() {
-	const handleFetchApi = () => {
-		axios.get('/api/hello/').then((res) => {
-			alert(res.data)
-		})
-	}
 
 	const summaryRef = useRef<HTMLDivElement>(null)
 	const personalityRef = useRef<HTMLDivElement>(null)
 	const codingRef = useRef<HTMLDivElement>(null)
+
 	const handleScrollIntoView = (ref: React.RefObject<HTMLDivElement>) => {
 		ref.current?.scrollIntoView({behavior: 'smooth'})
 	}
@@ -30,12 +24,12 @@ function App() {
 						<p className="greetings">Hello, my name is</p>
 						<p className="name">Gleb Abramov</p>
 						<p className="job-title">I am a Fullstack Developer from Hamburg, Germany.</p>
+						<button className="button--welcome" onClick={() => handleScrollIntoView(personalityRef)}>
+							Welcome!
+						</button>
 					</div>
 				</section>
 
-				<button className="button--welcome" onClick={() => handleScrollIntoView(personalityRef)}>
-					Welcome!
-				</button>
 
 				<section id="details" ref={personalityRef}>
 					<div className="full-screen-unit">
