@@ -10,7 +10,7 @@ function LegalNotice() {
 	const TMG_section_5 = "https://www.gesetze-im-internet.de/tmg/__5.html"
 
 	return (
-		<Layout>
+		<Layout title="Legal Notice">
 			<aside className="overhead">
 				<button className="overhead--button" onClick={() => navigate("/")}>
 					<FontAwesomeIcon icon={faXmark} size="2xl" />

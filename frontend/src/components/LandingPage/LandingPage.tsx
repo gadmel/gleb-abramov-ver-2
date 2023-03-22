@@ -14,7 +14,7 @@ function LandingPage() {
 	}
 
 	return (
-		<Layout>
+		<Layout title="Fullstack Development">
 			<section id="summary" ref={summaryRef}>
 				<div className="full-screen-unit">
 					<div className="avatar--wrapper">
