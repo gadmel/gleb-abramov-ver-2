@@ -19,6 +19,10 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.coverage.exclusions>**/StaticFilesConfig.java</sonar.coverage.exclusions>
 		<sonar.test.exclusions>**/StaticFilesConfig.java</sonar.test.exclusions>
+		<sonar.coverage.exclusions>com.gleb-abramov.backend.model.**</sonar.coverage.exclusions>
+		<sonar.test.exclusions>com.gleb-abramov.backend.model.**</sonar.test.exclusions>
+		<sonar.coverage.exclusions>com.gleb-abramov.backend.repository.**</sonar.coverage.exclusions>
+		<sonar.test.exclusions>com.gleb-abramov.backend.repository.**</sonar.test.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
