@@ -47,7 +47,7 @@ public class MongoUserDetailsService implements UserDetailsService {
 
 		MongoUserResponse currentUser = getCurrentUser(principal);
 		if (!currentUser.role().equals("ADMIN")) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to register new users");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to register new users");
 		}
 
 		if (user.username() == null || user.username().length() == 0) {

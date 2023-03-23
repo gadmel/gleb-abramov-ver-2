@@ -57,6 +57,7 @@ class MongoUserDetailsServiceTest {
 	ResponseStatusException usernameIsRequiredException = new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
 	ResponseStatusException passwordIsRequiredException = new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
 	ResponseStatusException userAlreadyExistsException = new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+	ResponseStatusException forbiddenException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to register new users");
 
 
 	@BeforeEach
@@ -119,8 +120,8 @@ class MongoUserDetailsServiceTest {
 
 		@Test
 		@DirtiesContext
-		@DisplayName("...should throw 'Unauthorized' (401) if current user does not exist or is not logged in")
-		void getCurrentUser_shouldThrowUnauthorized_ifUserDoesNotExist_unauthenticated() {
+		@DisplayName("...should throw 'Unauthorised' (401) if current user does not exist or is not logged in")
+		void getCurrentUser_shouldThrowUnauthorised_ifUserDoesNotExist_unauthenticated() {
 			//GIVEN
 			//WHEN
 			ResponseStatusException expected = userNotFoundException;
@@ -195,6 +196,20 @@ class MongoUserDetailsServiceTest {
 			mongoUserRepository.save(adminUser);
 			//WHEN
 			ResponseStatusException expected = userAlreadyExistsException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTO, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Forbidden' (403) if the user is not an admin")
+		void register_shouldThrowForbidden403_ifUserIsNotAdmin() {
+			//GIVEN
+			mongoUserRepository.save(basicUser);
+			//WHEN
+			ResponseStatusException expected = forbiddenException;
 			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTO, mockedPrincipal));
 			//THEN
 			assertEquals(expected.getClass(), actual.getClass());

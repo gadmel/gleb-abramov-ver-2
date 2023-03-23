@@ -60,7 +60,7 @@ class MongoUserControllerTest {
 
 		@Test
 		@DirtiesContext
-		@DisplayName("... should return 'Unauthorized' (401) if the user is not logged in (not authenticated)")
+		@DisplayName("... should return 'Unauthorised' (401) if the user is not logged in (not authenticated)")
 		void getCurrentUser_shouldReturnUnauthorised401_ifUserIsNotAuthenticated() throws Exception {
 			mockMvc.perform(get("/api/users/current/"))
 					.andExpect(status().isUnauthorized());
@@ -98,7 +98,7 @@ class MongoUserControllerTest {
 
 		@Test
 		@DirtiesContext
-		@DisplayName("... should return 'Unauthorized' (401) if the user with respective password does not exist")
+		@DisplayName("... should return 'Unauthorised' (401) if the user with respective password does not exist")
 		void login_shouldReturnUnauthorised401_ifUserWithRespectivePasswordDoesNotExist() throws Exception {
 			mockMvc.perform(post("/api/users/login/")
 							.with(httpBasic(adminUser.username(), adminUser.password()))
