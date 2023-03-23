@@ -183,7 +183,6 @@ class MongoUserControllerTest {
 									""")
 					)
 					.andExpect(status().isCreated());
-			//THEN
 		}
 
 		@Test
@@ -206,7 +205,6 @@ class MongoUserControllerTest {
 									""")
 					)
 					.andExpect(status().isConflict());
-			//THEN
 		}
 
 		@Test
