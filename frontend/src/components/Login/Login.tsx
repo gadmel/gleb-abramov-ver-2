@@ -1,7 +1,8 @@
 import {ChangeEvent, FormEvent, useState} from "react";
 import {useNavigate} from 'react-router-dom'
-import axios from "axios";
+
 import Layout from "../Layout/Layout";
+import authenticationService from "../../services/authenticationService";
 
 function Login() {
 	const [username, setUsername] = useState("")
@@ -19,22 +20,14 @@ function Login() {
 
 	function submitHandler(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
-		axios
-			.post(
-				'/api/users/login/',
-				{},
-				{
-					headers: {
-						Authorization: `Basic ${window.btoa(`${username}:${password}`)}`,
-					},
-				}
-			)
+		authenticationService
+			.login(username, password)
 			.then(() => {
 				setUsername('')
 				setPassword('')
 				navigate('/')
 			})
-			.catch((error) => {
+			.catch((error: Error) => {
 				console.log(error)
 			})
 	}

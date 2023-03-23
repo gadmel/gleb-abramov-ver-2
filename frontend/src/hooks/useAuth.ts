@@ -1,24 +1,17 @@
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-
-export type User = {
-	id: string
-	username: string
-	role: string
-	associatedResume: string
-}
+import {useEffect, useState} from 'react'
+import {useLocation, useNavigate} from 'react-router-dom'
+import authenticationService, {IncomingUser} from "../services/authenticationService";
 
 function useAuth(redirectToSignIn?: boolean) {
-	const [user, setUser] = useState<User | null>(null)
-	const { pathname } = useLocation()
+	const [user, setUser] = useState<IncomingUser | null>(null)
+	const {pathname} = useLocation()
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		axios
-			.get('/api/users/current/')
-			.then((res) => {
-				setUser(res.data)
+		authenticationService
+			.getCurrentUser()
+			.then(user => {
+				setUser(user)
 			})
 			.catch((e) => {
 				if (redirectToSignIn && e.response.status === 401) {

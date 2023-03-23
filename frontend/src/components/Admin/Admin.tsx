@@ -1,21 +1,21 @@
 import React from "react";
 import {useNavigate} from 'react-router-dom'
-import axios from 'axios'
 import useAuth from "../../hooks/useAuth";
 import Layout from "../Layout/Layout";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
+import authenticationService from "../../services/authenticationService";
 
 function Admin() {
 	const user = useAuth(true)
 	const navigate = useNavigate()
 
-	if (user !== null && user.role !== "ADMIN") {
+	if (user?.role !== "ADMIN") {
 		navigate('/')
 	}
 
 	const handleLogout = () => {
-		axios
-			.post('/api/users/logout/')
+		authenticationService
+			.logout()
 			.then(() => {
 				navigate('/login')
 			})
