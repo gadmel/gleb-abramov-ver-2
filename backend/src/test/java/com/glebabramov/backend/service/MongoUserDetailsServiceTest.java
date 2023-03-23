@@ -51,6 +51,8 @@ class MongoUserDetailsServiceTest {
 
 	MongoUserResponse responseDTO = new MongoUserResponse(adminUser.id(), adminUser.username(), adminUser.role(), adminUser.associatedResume());
 	MongoUserRequest requestDTO = new MongoUserRequest(adminUser.username(), adminUser.password());
+	MongoUserRequest basicRequestDTO = new MongoUserRequest(basicUser.username(), basicUser.password());
+
 
 	ResponseStatusException userNotFoundException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
 	UsernameNotFoundException usernameNotFoundException = new UsernameNotFoundException("User not found");
@@ -208,9 +210,10 @@ class MongoUserDetailsServiceTest {
 		void register_shouldThrowForbidden403_ifUserIsNotAdmin() {
 			//GIVEN
 			mongoUserRepository.save(basicUser);
+			when(mockedPrincipal.getName()).thenReturn(basicUser.username());
 			//WHEN
 			ResponseStatusException expected = forbiddenException;
-			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTO, mockedPrincipal));
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(basicRequestDTO, mockedPrincipal));
 			//THEN
 			assertEquals(expected.getClass(), actual.getClass());
 			assertEquals(expected.getMessage(), actual.getMessage());
