@@ -33,10 +33,10 @@ public class SecurityConfig {
 				.sessionManagement(config ->
 						config.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
 				.authorizeHttpRequests()
-				.requestMatchers("/api/**").authenticated()
 				.requestMatchers(HttpMethod.GET, "/api/csrf/").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/register").hasRole("ADMIN")
+				.requestMatchers("/api/**").authenticated()
 				.anyRequest().permitAll()
 				.and()
 				.logout(logout -> logout
