@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-export type IncomingUser = {
-	id: string;
-	username: string;
-	role: string;
-	associatedResume: string;
+export interface User {
+	readonly id: string;
+	readonly username: string;
+	readonly role: string;
+	readonly associatedResume: string;
 }
 
 
@@ -19,7 +19,7 @@ class AuthenticationService {
 						Authorization: `Basic ${window.btoa(`${username}:${password}`)}`,
 					},
 				})
-			.then((response: { data: IncomingUser }) => {
+			.then((response: { data: User }) => {
 				return response.data;
 			});
 	}
@@ -35,7 +35,7 @@ class AuthenticationService {
 	register(username: string, password: string) {
 		return axios
 			.post('/api/users/register/', {username, password})
-			.then((response: { data: IncomingUser }) => {
+			.then((response: { data: User }) => {
 				return response.data;
 			});
 	}
@@ -43,7 +43,7 @@ class AuthenticationService {
 	getCurrentUser() {
 		return axios
 			.get('/api/users/current/')
-			.then((response: { data: IncomingUser }) => {
+			.then((response: { data: User }) => {
 				return response.data;
 			});
 	}

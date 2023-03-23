@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react'
 import {useLocation, useNavigate} from 'react-router-dom'
-import authenticationService, {IncomingUser} from "../services/authenticationService";
+import authenticationService, {User} from "../services/authenticationService";
 
 function useAuth(redirectToSignIn?: boolean) {
-	const [user, setUser] = useState<IncomingUser | null>(null)
+	const [user, setUser] = useState<User | null>(null)
 	const {pathname} = useLocation()
 	const navigate = useNavigate()
 
