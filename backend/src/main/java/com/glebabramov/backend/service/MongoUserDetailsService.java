@@ -43,7 +43,12 @@ public class MongoUserDetailsService implements UserDetailsService {
 		return new MongoUserResponse(user.id(), user.username(), user.role(), user.associatedResume());
 	}
 
-	public MongoUserResponse register(MongoUserRequest user) {
+	public MongoUserResponse register(MongoUserRequest user, Principal principal) {
+
+		MongoUserResponse currentUser = getCurrentUser(principal);
+		if (!currentUser.role().equals("ADMIN")) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to register new users");
+		}
 
 		if (user.username() == null || user.username().length() == 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");

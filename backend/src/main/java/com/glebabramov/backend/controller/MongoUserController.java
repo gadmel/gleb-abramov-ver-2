@@ -26,15 +26,15 @@ public class MongoUserController {
 		return mongoUserDetailsService.getCurrentUser(principal);
 	}
 
-	@PostMapping("/logout")
+	@PostMapping("/logout/")
 	public void logout() {
 		// logout is handled by Spring Security
 	}
 
 	@PostMapping("/register/")
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public MongoUserResponse register(@RequestBody MongoUserRequest user) {
-		return mongoUserDetailsService.register(user);
+	public MongoUserResponse register(@RequestBody MongoUserRequest user, Principal principal) {
+		return mongoUserDetailsService.register(user, principal);
 	}
 
 }

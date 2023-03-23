@@ -46,22 +46,26 @@ class MongoUserDetailsServiceTest {
 	Principal mockedPrincipal = mock(Principal.class);
 
 	// Test data
-	MongoUser user = new MongoUser("Some ID", "Name", "Test password", "BASIC", "[]");
-	MongoUserResponse responseDTO = new MongoUserResponse(user.id(), user.username(), user.role(), user.associatedResume());
-	MongoUserRequest requestDTO = new MongoUserRequest(user.username(), user.password());
+	MongoUser adminUser = new MongoUser("Some ID", "Admin's name", "Test password", "ADMIN", "[]");
+	MongoUser basicUser = new MongoUser("Some ID", "Basic user's name", "Test password", "BASIC", "[]");
+
+	MongoUserResponse responseDTO = new MongoUserResponse(adminUser.id(), adminUser.username(), adminUser.role(), adminUser.associatedResume());
+	MongoUserRequest requestDTO = new MongoUserRequest(adminUser.username(), adminUser.password());
+
 	ResponseStatusException userNotFoundException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
 	UsernameNotFoundException usernameNotFoundException = new UsernameNotFoundException("User not found");
-	ResponseStatusException userAlreadyExistsException = new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 	ResponseStatusException usernameIsRequiredException = new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
-ResponseStatusException passwordIsRequiredException = new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
+	ResponseStatusException passwordIsRequiredException = new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
+	ResponseStatusException userAlreadyExistsException = new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 
 
 	@BeforeEach
 	void setUp() {
 		mongoUserDetailsService = new MongoUserDetailsService(mongoUserRepository, idService, passwordEncoder);
-		mongoUserRepository.findByUsername(user.username()).ifPresent(mongoUserRepository::delete);
-		when(mockedPrincipal.getName()).thenReturn(user.username());
-		when(idService.generateId()).thenReturn(user.id());
+		mongoUserRepository.findByUsername(adminUser.username()).ifPresent(mongoUserRepository::delete);
+		mongoUserRepository.findByUsername(basicUser.username()).ifPresent(mongoUserRepository::delete);
+		when(mockedPrincipal.getName()).thenReturn(adminUser.username());
+		when(idService.generateId()).thenReturn(adminUser.id());
 	}
 
 	@Nested
@@ -69,32 +73,32 @@ ResponseStatusException passwordIsRequiredException = new ResponseStatusExceptio
 	class loadUserByUsername {
 
 		@Test
+		@DirtiesContext
 		@DisplayName("...should return a MongoUserResponseDTO of the user with the given username if user exists")
 		void loadUserByUsername_shouldReturnMongoUserResponseDTO_ifUserExists() {
 			//GIVEN
-			mongoUserRepository.save(user);
-			GrantedAuthority grantedAuthority = () -> "ROLE_" + user.role();
+			mongoUserRepository.save(adminUser);
+			GrantedAuthority grantedAuthority = () -> "ROLE_" + adminUser.role();
 			Collection<GrantedAuthority> mongoUserAuthorities = new ArrayList<>(Arrays.asList(grantedAuthority));
 			//WHEN
-			UserDetails expected = new User(user.username(), user.password(), mongoUserAuthorities);
-			UserDetails actual = mongoUserDetailsService.loadUserByUsername(user.username());
+			UserDetails expected = new User(adminUser.username(), adminUser.password(), mongoUserAuthorities);
+			UserDetails actual = mongoUserDetailsService.loadUserByUsername(adminUser.username());
 			//THEN
 			assertEquals(expected, actual);
 		}
 
 
 		@Test
+		@DirtiesContext
 		@DisplayName("...should throw a UsernameNotFoundException if user does not exist")
 		void loadUserByUsername_shouldThrowUsernameNotFoundException_ifUserDoesNotExist() {
 			//WHEN
 			UsernameNotFoundException expected = usernameNotFoundException;
-			UsernameNotFoundException actual = assertThrows(expected.getClass(), () -> mongoUserDetailsService.loadUserByUsername(user.username()));
+			UsernameNotFoundException actual = assertThrows(expected.getClass(), () -> mongoUserDetailsService.loadUserByUsername(adminUser.username()));
 			//THEN
 			assertEquals(expected.getClass(), actual.getClass());
 			assertEquals(expected.getMessage(), actual.getMessage());
 		}
-
-
 	}
 
 	@Nested
@@ -105,7 +109,7 @@ ResponseStatusException passwordIsRequiredException = new ResponseStatusExceptio
 		@DisplayName("...should return a MongoUserResponseDTO of the current user if user exists and is logged in")
 		void getCurrentUser_shouldReturnMongoUserResponseDTO_ifUserExistsAndIsLoggedIn() {
 			//GIVEN
-			mongoUserRepository.save(user);
+			mongoUserRepository.save(adminUser);
 			//WHEN
 			MongoUserResponse expected = responseDTO;
 			MongoUserResponse actual = mongoUserDetailsService.getCurrentUser(mockedPrincipal);
@@ -114,8 +118,10 @@ ResponseStatusException passwordIsRequiredException = new ResponseStatusExceptio
 		}
 
 		@Test
+		@DirtiesContext
 		@DisplayName("...should throw 'Unauthorized' (401) if current user does not exist or is not logged in")
 		void getCurrentUser_shouldThrowUnauthorized_ifUserDoesNotExist_unauthenticated() {
+			//GIVEN
 			//WHEN
 			ResponseStatusException expected = userNotFoundException;
 			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.getCurrentUser(mockedPrincipal));
@@ -129,25 +135,32 @@ ResponseStatusException passwordIsRequiredException = new ResponseStatusExceptio
 	@DisplayName("register()")
 	class register {
 		@Test
+		@DirtiesContext
 		@DisplayName("...should return a MongoUserResponseDTO of the created user if username does not exist and provided username amd password are not empty")
 		void register_shouldReturnMongoUserResponseDTOAndCreated201_ifUsernameDoesNotExistAndProvidedUsernameAndPasswordAreNotEmpty() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			MongoUserRequest requestDTOBasucUser = new MongoUserRequest(basicUser.username(), basicUser.password());
+			MongoUserResponse responseDTOBasicUser = new MongoUserResponse(basicUser.id(), basicUser.username(), basicUser.role(), basicUser.associatedResume());
 			//WHEN
-			MongoUserResponse expected = responseDTO;
-			MongoUserResponse actual = mongoUserDetailsService.register(requestDTO);
+			MongoUserResponse expected = responseDTOBasicUser;
+			MongoUserResponse actual = mongoUserDetailsService.register(requestDTOBasucUser, mockedPrincipal);
 			//THEN
 			assertEquals(expected, actual);
 		}
 
 		@Test
+		@DirtiesContext
 		@DisplayName("...should throw 'Bad Request' (400) if username is empty or null")
 		void register_shouldThrowBadRequest400_ifUsernameIsEmptyOrNull() {
 			//GIVEN
+			mongoUserRepository.save(adminUser);
 			MongoUserRequest requestDTOWithoutName = new MongoUserRequest("", "password");
 			MongoUserRequest requestDTOWithNameNull = new MongoUserRequest(null, "password");
 			//WHEN
 			ResponseStatusException expected = usernameIsRequiredException;
-			ResponseStatusException actual1 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOWithoutName));
-			ResponseStatusException actual2 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOWithNameNull));
+			ResponseStatusException actual1 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOWithoutName, mockedPrincipal));
+			ResponseStatusException actual2 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOWithNameNull, mockedPrincipal));
 			//THEN
 			assertEquals(expected.getClass(), actual1.getClass());
 			assertEquals(expected.getMessage(), actual1.getMessage());
@@ -156,15 +169,17 @@ ResponseStatusException passwordIsRequiredException = new ResponseStatusExceptio
 		}
 
 		@Test
+		@DirtiesContext
 		@DisplayName("...should throw 'Bad Request' (400) if password is empty or null")
 		void register_shouldThrowBadRequest400_ifPasswordIsEmptyOrNull() {
 			//GIVEN
+			mongoUserRepository.save(adminUser);
 			MongoUserRequest requestDTOWithoutPassword = new MongoUserRequest("username", "");
 			MongoUserRequest requestDTOWithPasswordNull = new MongoUserRequest("username", null);
 			//WHEN
 			ResponseStatusException expected = passwordIsRequiredException;
-			ResponseStatusException actual1 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOWithoutPassword));
-			ResponseStatusException actual2 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOWithPasswordNull));
+			ResponseStatusException actual1 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOWithoutPassword, mockedPrincipal));
+			ResponseStatusException actual2 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOWithPasswordNull, mockedPrincipal));
 			//THEN
 			assertEquals(expected.getClass(), actual1.getClass());
 			assertEquals(expected.getMessage(), actual1.getMessage());
@@ -173,13 +188,14 @@ ResponseStatusException passwordIsRequiredException = new ResponseStatusExceptio
 		}
 
 		@Test
+		@DirtiesContext
 		@DisplayName("...should throw 'Conflict' (409) if the username is taken")
 		void register_shouldThrowConflict409_ifUsernameIsTaken() {
 			//GIVEN
-			mongoUserRepository.save(user);
+			mongoUserRepository.save(adminUser);
 			//WHEN
 			ResponseStatusException expected = userAlreadyExistsException;
-			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTO));
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTO, mockedPrincipal));
 			//THEN
 			assertEquals(expected.getClass(), actual.getClass());
 			assertEquals(expected.getMessage(), actual.getMessage());
