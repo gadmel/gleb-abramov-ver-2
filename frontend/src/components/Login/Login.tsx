@@ -8,6 +8,15 @@ function Login() {
 	const [username, setUsername] = useState("")
 	const [password, setPassword] = useState("")
 
+	const user = useAuth()
+	const navigate = useNavigate()
+
+	if (!!user && user?.role === "ADMIN") {
+		navigate('/admin')
+	} else if (!!user && user?.role !== "ADMIN") {
+		navigate('/')
+	}
+
 	function handleUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		setUsername(event.target.value)
 	}
@@ -31,30 +40,26 @@ function Login() {
 			.then(() => {
 				setUsername('')
 				setPassword('')
+				navigate('/')
 			})
 			.catch((error) => {
 				console.log(error)
 			})
 	}
 
-	const user = useAuth()
-	const navigate = useNavigate()
-
-	return !!user
-		? (user.role === "ADMIN" ? navigate("/admin") : navigate("/"))
-		: (
-			<Layout title="Login">
-				<section id="login">
-					<form className="full-screen-unit" onSubmit={submitHandler}>
-						<label htmlFor="username">Username</label>
-						<input type={"text"} value={username} onChange={handleUsernameChange}/>
-						<label htmlFor="password">Password</label>
-						<input type={"password"} value={password} onChange={handlePasswordChange}/>
-						<button type={"submit"}>Log in</button>
-					</form>
-				</section>
-			</Layout>
-		)
+	return (
+		<Layout title="Login">
+			<section id="login">
+				<form className="full-screen-unit" onSubmit={submitHandler}>
+					<label htmlFor="username">Username</label>
+					<input type={"text"} value={username} onChange={handleUsernameChange}/>
+					<label htmlFor="password">Password</label>
+					<input type={"password"} value={password} onChange={handlePasswordChange}/>
+					<button type={"submit"}>Log in</button>
+				</form>
+			</section>
+		</Layout>
+	)
 }
 
 export default Login
