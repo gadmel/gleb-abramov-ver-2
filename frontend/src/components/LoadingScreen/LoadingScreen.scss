@@ -1,0 +1,9 @@
+@import "../../sass/variables";
+
+#loading > div.full-screen-unit > * {
+	font-size: calc(6em + 10vw);
+	color: $font-color--legal--notice;
+	@media (prefers-color-scheme: light) {
+	 color: $font-color--personal--light;
+	}
+}

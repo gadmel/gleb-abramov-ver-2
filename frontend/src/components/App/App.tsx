@@ -31,8 +31,8 @@ function App() {
 
 				<Route path={"/login"} element={<Login/>}/>
 
-				<Route path={"/register"} element={<Register/>}/>
-				<Route path={"/admin"} element={<Admin/>}/>
+				<Route path={"/secured/"} element={<Admin/>}/>
+				<Route path={"/secured/register/"} element={<Register/>}/>
 
 				<Route path="/*" element={<Navigate to="/"/>}/>
 

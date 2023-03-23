@@ -2,20 +2,12 @@ import {ChangeEvent, FormEvent, useState} from "react";
 import {useNavigate} from 'react-router-dom'
 import axios from "axios";
 import Layout from "../Layout/Layout";
-import useAuth from "../../hooks/useAuth";
 
 function Login() {
 	const [username, setUsername] = useState("")
 	const [password, setPassword] = useState("")
 
-	const user = useAuth()
 	const navigate = useNavigate()
-
-	if (!!user && user?.role === "ADMIN") {
-		navigate('/admin')
-	} else if (!!user && user?.role !== "ADMIN") {
-		navigate('/')
-	}
 
 	function handleUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		setUsername(event.target.value)

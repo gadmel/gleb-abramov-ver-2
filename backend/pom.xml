@@ -17,14 +17,8 @@
 		<java.version>17</java.version>
 		<sonar.organization>gadmel</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<sonar.coverage.exclusions>com.gleb-abramov.backend.model.**</sonar.coverage.exclusions>
-		<sonar.test.exclusions>com.gleb-abramov.backend.model.**</sonar.test.exclusions>
-		<sonar.coverage.exclusions>com.gleb-abramov.backend.repository.**</sonar.coverage.exclusions>
-		<sonar.test.exclusions>com.gleb-abramov.backend.repository.**</sonar.test.exclusions>
 		<sonar.coverage.exclusions>com.gleb-abramov.backend.config.StaticFilesConfig.java</sonar.coverage.exclusions>
 		<sonar.test.exclusions>com.gleb-abramov.backend.config.StaticFilesConfig.java</sonar.test.exclusions>
-		<sonar.coverage.exclusions>com.gleb-abramov.backend.service.IdService.java</sonar.coverage.exclusions>
-		<sonar.test.exclusions>com.gleb-abramov.backend.service.IdService.java</sonar.test.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
