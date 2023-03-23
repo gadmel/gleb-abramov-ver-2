@@ -1,6 +1,8 @@
 import {ChangeEvent, FormEvent, useState} from "react";
+import {useNavigate} from 'react-router-dom'
 import axios from "axios";
 import Layout from "../Layout/Layout";
+import useAuth from "../../hooks/useAuth";
 
 function Login() {
 	const [username, setUsername] = useState("")
@@ -16,8 +18,6 @@ function Login() {
 
 	function submitHandler(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
-		console.log(username, password)
-		console.log(window.btoa(`${username}:${password}`))
 		axios
 			.post(
 				'/api/users/login/',
@@ -37,19 +37,24 @@ function Login() {
 			})
 	}
 
-	return (
-		<Layout title="Login">
-			<section id="login">
-				<form className="full-screen-unit" onSubmit={submitHandler}>
-					<label htmlFor="username">Username</label>
-					<input type={"text"} value={username} onChange={handleUsernameChange}/>
-					<label htmlFor="password">Password</label>
-					<input type={"password"} value={password} onChange={handlePasswordChange}/>
-					<button type={"submit"}>Log in</button>
-				</form>
-			</section>
-		</Layout>
-	)
+	const user = useAuth()
+	const navigate = useNavigate()
+
+	return !!user
+		? (user.role === "ADMIN" ? navigate("/admin") : navigate("/"))
+		: (
+			<Layout title="Login">
+				<section id="login">
+					<form className="full-screen-unit" onSubmit={submitHandler}>
+						<label htmlFor="username">Username</label>
+						<input type={"text"} value={username} onChange={handleUsernameChange}/>
+						<label htmlFor="password">Password</label>
+						<input type={"password"} value={password} onChange={handlePasswordChange}/>
+						<button type={"submit"}>Log in</button>
+					</form>
+				</section>
+			</Layout>
+		)
 }
 
 export default Login

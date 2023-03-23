@@ -1,10 +1,23 @@
 import React from 'react'
-import {Route, Routes} from 'react-router-dom'
+import {Route, Routes, Navigate} from 'react-router-dom'
+import axios from 'axios'
+import Cookies from 'js-cookie'
 
 import LandingPage from "../LandingPage/LandingPage";
 import LegalNotice from "../LegalNotice/LegalNotice";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
+axios.interceptors.request.use(
+	function (config) {
+		return fetch('/api/csrf/').then(() => {
+			config.headers['X-XSRF-TOKEN'] = Cookies.get('XSRF-TOKEN')
+			return config
+		})
+	},
+	function (error) {
+		return Promise.reject(error)
+	}
+)
 
 function App() {
 
@@ -16,7 +29,9 @@ function App() {
 
 				<Route path={"/login"} element={<Login/>} />
 				<Route path={"/register"} element={<Register/>} />
-				<Route path="*" element={<h1>404 - Page not found</h1>}/>
+				<Route path={"/admin"} element={<div>Admin</div>} />
+
+				<Route path="/*" element={<Navigate to="/"/>}/>
 
 			</Routes>
 		</div>

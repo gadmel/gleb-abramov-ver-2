@@ -16,6 +16,11 @@ import java.security.Principal;
 public class MongoUserController {
 	private final MongoUserDetailsService mongoUserDetailsService;
 
+	@GetMapping("/current/")
+	public MongoUserResponse getCurrentUser(Principal principal) {
+		return mongoUserDetailsService.getCurrentUser(principal);
+	}
+
 	@PostMapping("/login/")
 	public MongoUserResponse login(Principal principal) {
 		return mongoUserDetailsService.getCurrentUser(principal);
