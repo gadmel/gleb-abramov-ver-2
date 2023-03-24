@@ -47,8 +47,8 @@ class MongoUserControllerTest {
 
 	// Integration tests for the MongoUserController incl.:
 	// GET /api/users/current/,
-	// POST /api/users/login,
-	// POST /api/users/register
+	// POST /api/users/login/,
+	// POST /api/users/register/
 
 	@BeforeEach
 	void setUp() {

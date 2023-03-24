@@ -33,7 +33,7 @@ function Layout(props: Props) {
 			{!isLegalPage && (
 				<footer>
 					<p>2023 by Gleb Abramov</p>
-					<p><Link to="/legal">Legal Notice</Link> - <Link to="/secured/">Secured</Link></p>
+					<p><Link to="/legal/">Legal Notice</Link> - <Link to="/secured/">Secured</Link></p>
 				</footer>
 			)}
 		</>

@@ -17,7 +17,7 @@ function Admin() {
 		authenticationService
 			.logout()
 			.then(() => {
-				navigate('/login')
+				navigate('/login/')
 			})
 			.catch(error => {
 				console.log(error)
