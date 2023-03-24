@@ -29,18 +29,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class MongoUserControllerTest {
+
+	// Dependencies of the subject under test
 	@Autowired
 	MockMvc mockMvc;
 	@Autowired
 	MongoUserRepository mongoUserRepository;
-
 	Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
 	// Mock of the principal interface
 	Principal mockedPrincipal = mock(Principal.class);
+
 	// Test data
 	MongoUser adminUser;
 	MongoUser basicUser;
+	String rawPassword = "password";
 
 	// Integration tests for the MongoUserController incl.:
 	// GET /api/users/current/,
@@ -49,8 +52,8 @@ class MongoUserControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		adminUser = new MongoUser("Some ID", "Test admin", encoder.encode("admin"), "ADMIN", "company");
-		basicUser = new MongoUser("Another ID", "Test user", encoder.encode("basic"), "BASIC", "company");
+		adminUser = new MongoUser("Some ID", "Test admin", encoder.encode(rawPassword), "ADMIN", "company");
+		basicUser = new MongoUser("Another ID", "Test user", encoder.encode(rawPassword), "BASIC", "company");
 		when(mockedPrincipal.getName()).thenReturn(adminUser.username());
 	}
 
@@ -72,9 +75,7 @@ class MongoUserControllerTest {
 		@DisplayName("... should return 'OK' (200) and the user's data without the password if the user is logged in (authenticated)")
 		void getCurrentUser_shouldReturnOK200_andUserWithoutPassword_ifUserIsAuthenticated() throws Exception {
 			// GIVEN
-			MongoUser expected = new MongoUser(adminUser.id(), adminUser.username(), encoder.encode(adminUser.password()), adminUser.role(), adminUser.associatedResume());
-			mongoUserRepository.save(expected);
-
+			mongoUserRepository.save(adminUser);
 			// THEN
 			mockMvc.perform(get("/api/users/current/"))
 					.andExpect(status().isOk())
@@ -101,7 +102,7 @@ class MongoUserControllerTest {
 		@DisplayName("... should return 'Unauthorised' (401) if the user with respective password does not exist")
 		void login_shouldReturnUnauthorised401_ifUserWithRespectivePasswordDoesNotExist() throws Exception {
 			mockMvc.perform(post("/api/users/login/")
-							.with(httpBasic(adminUser.username(), adminUser.password()))
+							.with(httpBasic(adminUser.username(), rawPassword))
 							.with(csrf())
 							.contentType(MediaType.APPLICATION_JSON)
 							.content("{}"))
@@ -113,11 +114,10 @@ class MongoUserControllerTest {
 		@DisplayName("...should return user object without password (200) if the user with respective password exists")
 		void login_shouldReturnUserObjectWithoutPassword_ifUserWithRespectivePasswordExists() throws Exception {
 			// GIVEN
-			MongoUser expected = new MongoUser(adminUser.id(), adminUser.username(), encoder.encode(adminUser.password()), adminUser.role(), adminUser.associatedResume());
-			mongoUserRepository.save(expected);
+			mongoUserRepository.save(adminUser);
 			// THEN
 			mockMvc.perform(post("/api/users/login/")
-							.with(httpBasic(adminUser.username(), adminUser.password()))
+							.with(httpBasic(adminUser.username(), rawPassword))
 							.with(csrf())
 							.contentType(MediaType.APPLICATION_JSON)
 							.content("{}"))
@@ -133,21 +133,20 @@ class MongoUserControllerTest {
 					.andExpect(jsonPath("$.id").isNotEmpty())
 					.andExpect(jsonPath("$.password").doesNotExist());
 		}
+
 	}
 
 	@Nested
 	@DisplayName("POST /api/users/register/ - Admin only")
 	class register {
 
-
 		@Test
 		@DirtiesContext
 		@WithMockUser(username = "Test user", roles = "BASIC")
-		@DisplayName("... should return 'Forbidden' (403) if the user is not an admin")
+		@DisplayName("... should return 'Forbidden' (403) if the user registering is not an admin")
 		void register_shouldReturnForbidden403_ifTheUserIsNotAnAdmin() throws Exception {
 			// GIVEN
-			MongoUser userInDB = new MongoUser(basicUser.id(), basicUser.username(), encoder.encode(basicUser.password()), basicUser.role(), basicUser.associatedResume());
-			mongoUserRepository.save(userInDB);
+			mongoUserRepository.save(basicUser);
 			// WHEN
 			mockMvc.perform(post("/api/users/register/")
 							.with(csrf())
@@ -167,10 +166,9 @@ class MongoUserControllerTest {
 		@DirtiesContext
 		@WithMockUser(username = "Test admin", roles = "ADMIN")
 		@DisplayName("...should return 'Created' (201) if the user registering is an admin")
-		void register_shouldReturnCreated201_ifTheUserRegisteringIsAnAdmin() throws Exception {
+		void register_shouldReturnCreated201_ifTheUserIsAnAdmin() throws Exception {
 			// GIVEN
-			MongoUser userInDB = new MongoUser(adminUser.id(), adminUser.username(), encoder.encode(adminUser.password()), adminUser.role(), adminUser.associatedResume());
-			mongoUserRepository.save(userInDB);
+			mongoUserRepository.save(adminUser);
 			//WHEN
 			mockMvc.perform(post("/api/users/register/")
 							.with(csrf())
@@ -191,15 +189,15 @@ class MongoUserControllerTest {
 		@DisplayName("...should return 'Conflict' (409) if the user already exists")
 		void register_shouldReturnConflict409_ifTheUserAlreadyExists() throws Exception {
 			// GIVEN
-			MongoUser userInDB = new MongoUser(adminUser.id(), adminUser.username(), encoder.encode(adminUser.password()), adminUser.role(), adminUser.associatedResume());
-			mongoUserRepository.save(userInDB);
+			mongoUserRepository.save(adminUser); // adminUser is here in order to be able to register a new user with it
+			mongoUserRepository.save(basicUser); // basicUser is herewith already in the DB and should cause a conflict
 			//WHEN
 			mockMvc.perform(post("/api/users/register/")
 							.with(csrf())
 							.contentType(MediaType.APPLICATION_JSON)
 							.content("""
 									{
-										"username": "Test admin",
+										"username": "Test user",
 										"password": "Test password"
 									}
 									""")
@@ -213,8 +211,7 @@ class MongoUserControllerTest {
 		@DisplayName("...should return 'Bad Request' (400) if the username or password is missing")
 		void register_shouldReturnBadRequest400_ifTheUsernameOrPasswordIsMissing() throws Exception {
 			// GIVEN
-			MongoUser userInDB = new MongoUser(adminUser.id(), adminUser.username(), encoder.encode(adminUser.password()), adminUser.role(), adminUser.associatedResume());
-			mongoUserRepository.save(userInDB);
+			mongoUserRepository.save(adminUser);
 			//WHEN
 			mockMvc.perform(post("/api/users/register/")
 							.with(csrf())
