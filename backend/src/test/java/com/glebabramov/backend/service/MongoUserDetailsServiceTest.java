@@ -32,27 +32,22 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class MongoUserDetailsServiceTest {
 
-	// Dependencies or mocks of the dependencies of the subject under test
 	@Autowired
 	MongoUserRepository mongoUserRepository;
 	IdService idService = mock(IdService.class);
 	PasswordEncoder passwordEncoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
-	// Subject under test instance
 	@Autowired
 	MongoUserDetailsService mongoUserDetailsService;
 
-	// Mock of the principal interface
 	Principal mockedPrincipal = mock(Principal.class);
 
-	// Test data
 	MongoUser adminUser = new MongoUser("Some ID", "Admin's name", "Test password", "ADMIN", "[]");
 	MongoUser basicUser = new MongoUser("Some ID", "Basic user's name", "Test password", "BASIC", "[]");
 
 	MongoUserResponse responseDTO = new MongoUserResponse(adminUser.id(), adminUser.username(), adminUser.role(), adminUser.associatedResume());
 	MongoUserRequest requestDTO = new MongoUserRequest(adminUser.username(), adminUser.password());
 	MongoUserRequest basicRequestDTO = new MongoUserRequest(basicUser.username(), basicUser.password());
-
 
 	ResponseStatusException userNotFoundException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
 	UsernameNotFoundException usernameNotFoundException = new UsernameNotFoundException("User not found");

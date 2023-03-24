@@ -26,7 +26,6 @@ public class MongoUserDetailsService implements UserDetailsService {
 	private final IdService idService;
 	private final PasswordEncoder passwordEncoder;
 
-	// a necessary method for the UserDetailsService interface which we override in order to serve UserDetail objects to the Spring Security framework from our MongoUser objects
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		MongoUser mongoUser = repository.findByUsername(username)

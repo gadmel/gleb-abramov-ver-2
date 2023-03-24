@@ -30,25 +30,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class MongoUserControllerTest {
 
-	// Dependencies of the subject under test
 	@Autowired
 	MockMvc mockMvc;
 	@Autowired
 	MongoUserRepository mongoUserRepository;
 	Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
-	// Mock of the principal interface
 	Principal mockedPrincipal = mock(Principal.class);
 
-	// Test data
 	MongoUser adminUser;
 	MongoUser basicUser;
 	String rawPassword = "password";
-
-	// Integration tests for the MongoUserController incl.:
-	// GET /api/users/current/,
-	// POST /api/users/login/,
-	// POST /api/users/register/
 
 	@BeforeEach
 	void setUp() {
@@ -189,8 +181,8 @@ class MongoUserControllerTest {
 		@DisplayName("...should return 'Conflict' (409) if the user already exists")
 		void register_shouldReturnConflict409_ifTheUserAlreadyExists() throws Exception {
 			// GIVEN
-			mongoUserRepository.save(adminUser); // adminUser is here in order to be able to register a new user with it
-			mongoUserRepository.save(basicUser); // basicUser is herewith already in the DB and should cause a conflict
+			mongoUserRepository.save(adminUser);
+			mongoUserRepository.save(basicUser);
 			//WHEN
 			mockMvc.perform(post("/api/users/register/")
 							.with(csrf())
