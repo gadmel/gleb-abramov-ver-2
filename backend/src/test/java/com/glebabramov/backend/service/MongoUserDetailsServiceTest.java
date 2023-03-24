@@ -143,11 +143,11 @@ class MongoUserDetailsServiceTest {
 		void register_shouldReturnMongoUserResponseDTOAndCreated201_ifUsernameDoesNotExistAndProvidedUsernameAndPasswordAreNotEmpty() {
 			//GIVEN
 			mongoUserRepository.save(adminUser);
-			MongoUserRequest requestDTOBasucUser = new MongoUserRequest(basicUser.username(), basicUser.password());
+			MongoUserRequest requestDTOBasicUser = new MongoUserRequest(basicUser.username(), basicUser.password());
 			MongoUserResponse responseDTOBasicUser = new MongoUserResponse(basicUser.id(), basicUser.username(), basicUser.role(), basicUser.associatedResume());
 			//WHEN
 			MongoUserResponse expected = responseDTOBasicUser;
-			MongoUserResponse actual = mongoUserDetailsService.register(requestDTOBasucUser, mockedPrincipal);
+			MongoUserResponse actual = mongoUserDetailsService.register(requestDTOBasicUser, mockedPrincipal);
 			//THEN
 			assertEquals(expected, actual);
 		}
