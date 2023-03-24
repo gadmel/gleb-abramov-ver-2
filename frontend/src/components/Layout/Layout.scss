@@ -2,12 +2,18 @@
 
 footer {
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	padding: 1em;
 	font-weight: 700;
 	font-size: calc(0.7em + 0.8vw);
 	background-color: $background;
+	gap: calc(0.1em + 0.5vw);
+
+	& p {
+		margin-block: 0;
+	}
 
 	@media (prefers-color-scheme: light) {
 		background-image: linear-gradient(

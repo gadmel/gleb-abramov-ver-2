@@ -17,13 +17,30 @@
 		<java.version>17</java.version>
 		<sonar.organization>gadmel</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<sonar.coverage.exclusions>**/StaticFilesConfig.java</sonar.coverage.exclusions>
-		<sonar.test.exclusions>**/StaticFilesConfig.java</sonar.test.exclusions>
+		<sonar.coverage.exclusions>com.gleb-abramov.backend.config.StaticFilesConfig.java</sonar.coverage.exclusions>
+		<sonar.test.exclusions>com.gleb-abramov.backend.config.StaticFilesConfig.java</sonar.test.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -39,17 +56,17 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>
 			<version>4.6.1</version>
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>

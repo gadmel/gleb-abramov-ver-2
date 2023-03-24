@@ -1,7 +1,10 @@
 @import "../../sass/variables";
 
 
-#legal-notice {
+#legal-notice,
+#loading,
+#login,
+#register {
 	background-image: linear-gradient(to left bottom, #192330, #1e232d, #21232a, #232327, #242424);
 	@media (prefers-color-scheme: light) {
 		background-image: linear-gradient(to right top, #aecaea, #c7d6f0, #dde2f5, #f0f0f9, #ffffff);

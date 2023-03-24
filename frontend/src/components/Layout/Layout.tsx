@@ -1,6 +1,5 @@
 import React from 'react'
 import {Link, useLocation} from 'react-router-dom'
-// import Helmet
 import {Helmet} from 'react-helmet'
 
 type Props = {
@@ -33,7 +32,8 @@ function Layout(props: Props) {
 
 			{!isLegalPage && (
 				<footer>
-					<p>2023 by Gleb Abramov - <Link to="/legal">Legal Notice</Link></p>
+					<p>2023 by Gleb Abramov</p>
+					<p><Link to="/legal/">Legal Notice</Link> - <Link to="/secured/">Secured</Link></p>
 				</footer>
 			)}
 		</>
