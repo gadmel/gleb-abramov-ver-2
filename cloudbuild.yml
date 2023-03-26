@@ -35,6 +35,8 @@ steps:
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Backend: Execute mvn package'
     args: ['package']
+    env:
+      - secrets.MONGODB_URI
     dir: 'backend'
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
