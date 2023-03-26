@@ -34,7 +34,7 @@ steps:
   # Backend: Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Backend: Execute mvn package'
-    args: ['package -DskipTests']
+    args: ['package']
     dir: 'backend'
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
