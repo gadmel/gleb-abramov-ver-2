@@ -36,7 +36,7 @@ steps:
     id: 'Backend: Execute mvn package'
     entrypoint: bash
     secretEnv: ['MONGODB_URI']
-    args: ['-c', 'mvn package -Dspring.data.mongodb.uri=$DDDMONGODB_URI']
+    args: ['-c', 'mvn package -Dspring.data.mongodb.uri=MONGODB_URI']
     dir: 'backend'
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
