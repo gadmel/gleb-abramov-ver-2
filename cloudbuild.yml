@@ -31,19 +31,25 @@ steps:
     id: Print out the mongodb uri variable
     script: |
       echo $$MONGODB_URI    
-  # Backend: Execute mvn clean install
+  # Backend: Execute mvn test with dev profile
+  - name: 'gcr.io/cloud-builders/mvn'
+    id: 'Backend: Execute mvn test with dev profile'
+    entrypoint: bash
+    args: [ '-c', 'mvn test -Dspring.profiles.active=dev' ]
+    dir: 'backend'
+  # Backend: Execute 'mvn clean install' skipping tests
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Backend: Execute mvn clean install'
-    entrypoint: bash
     secretEnv: [ 'MONGODB_URI' ]
-    args: [ '-c', 'mvn clean install -Dspring.data.mongodb.uri=$$MONGODB_URI' ]
+    entrypoint: bash
+    args: [ '-c', 'mvn clean install -Dspring.data.mongodb.uri=$$MONGODB_URI -DskipTests' ]
     dir: 'backend'
   # Backend: Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Backend: Execute mvn package'
-    entrypoint: bash
     secretEnv: [ 'MONGODB_URI' ]
-    args: [ '-c', 'mvn package -Dspring.data.mongodb.uri=$$MONGODB_URI' ]
+    entrypoint: bash
+    args: [ '-c', 'mvn package -Dspring.data.mongodb.uri=$$MONGODB_URI -DskipTests' ]
     dir: 'backend'
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
@@ -64,7 +70,7 @@ steps:
     id: Deploy to Firebase
 availableSecrets:
   secretManager:
-    - versionName: projects/510222405282/secrets/GA_MONGODB_URI/versions/1
+    - versionName: projects/510222405282/secrets/GA_MONGODB_URI/versions/latest
       env: MONGODB_URI
 options:
   logging: CLOUD_LOGGING_ONLY

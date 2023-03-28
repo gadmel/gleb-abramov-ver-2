@@ -1,4 +1,4 @@
-FROM openjdk:19
+FROM openjdk:17
 ENV ENVIROMENT=prod
 MAINTAINER Gleb Abramov <admin@gleb-abramov.com>
 EXPOSE 8080
