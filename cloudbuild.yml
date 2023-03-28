@@ -30,7 +30,7 @@ steps:
     id: 'Backend: Execute mvn clean install'
     entrypoint: bash
     secretEnv: [ 'MONGODB_URI' ]
-    args: [ '-c', 'mvn clean install -Dspring.data.mongodb.uri=$$MONGODB_URI -Dspring.profiles.active=${MONGODB_URI}' ]
+    args: [ '-c', 'mvn clean install -Dspring.data.mongodb.uri=$$MONGODB_URI -Dspring.profiles.active=$$MONGODB_URI' ]
     dir: 'backend'
   # Backend: Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
