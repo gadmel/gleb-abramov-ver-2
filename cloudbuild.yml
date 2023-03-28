@@ -62,10 +62,10 @@ steps:
 #  - name: 'gcr.io/gleb-abramov/firebase'
 #    args: [ 'deploy', '--project=gleb-abramov' ]
 #    id: Deploy to Firebase
-#availableSecrets:
-#  secretManager:
-#    - versionName: projects/510222405282/secrets/GA_MONGODB_URI/versions/1
-#      env: MONGODB_URI
-#options:
-#  logging: CLOUD_LOGGING_ONLY
-#
+availableSecrets:
+  secretManager:
+    - versionName: projects/510222405282/secrets/GA_MONGODB_URI/versions/1
+      env: MONGODB_URI
+options:
+  logging: CLOUD_LOGGING_ONLY
+
