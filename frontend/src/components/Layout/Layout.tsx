@@ -9,7 +9,7 @@ type Props = {
 
 function Layout(props: Props) {
 	const {pathname} = useLocation()
-	const isLegalPage = pathname === '/legal/'
+	const isHomePage = pathname === '/'
 
 	return (
 		<>
@@ -30,7 +30,7 @@ function Layout(props: Props) {
 				{props.children}
 			</main>
 
-			{!isLegalPage && (
+			{isHomePage && (
 				<footer>
 					<p>2023 by Gleb Abramov. Version 1.0</p>
 					<p><Link to="/legal/">Legal Notice</Link> - <Link to="/secured/">Secured</Link></p>
