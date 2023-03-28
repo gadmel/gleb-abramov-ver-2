@@ -26,7 +26,7 @@ steps:
     script: |
       mv frontend/dist backend/src/main/resources/static
   # Print out the mongodb uri variable
-  - name: bash
+  - name: 'bash'
     secretEnv: [ 'MONGODB_URI' ]
     id: Print out the mongodb uri variable
     script: |
