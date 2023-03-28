@@ -31,6 +31,7 @@ steps:
     id: Print out the mongodb uri variable
     script: |
       echo $$MONGODB_URI
+      echo $$MONGODB_URI
     
 #  # Backend: Execute mvn clean install
 #  - name: 'gcr.io/cloud-builders/mvn'
