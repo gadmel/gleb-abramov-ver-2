@@ -31,13 +31,15 @@ steps:
     entrypoint: mvn
     args: ['install']
     dir: 'backend'
+  # Prepare a mongodb secret for the Google Cloud Build
+  - name: 'gcr.io/cloudbuilderes/gcloud'
+    id: 'Prepare a mongodb secret for the Google Cloud Build'
+    entrypoint: bash
+    args: ['-c', 'gcloud secrets versions access latest --secret=GA_MONGODB_URI > MONGODB_URI']
   # Backend: Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Backend: Execute mvn package'
-    entrypoint: bash
-    secretEnv: ['MONGODB_URI']
-    args: ['-c', 'mvn package -Dspring.data.mongodb.uri=MONGODB_URI']
-    dir: 'backend'
+    args: ['package -Dspring.data.mongodb.uri < MONGODB_URI']
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/gleb-abramov/app', '.']
