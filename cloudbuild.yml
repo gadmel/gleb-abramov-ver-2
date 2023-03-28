@@ -34,9 +34,9 @@ steps:
   # Backend: Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Backend: Execute mvn package'
-    args: ['package $MONGODB_URI']
-    env:
-      - MONGODB_URI=${{ secrets.MONGODB_URI }}
+    entrypoint: bash
+    secretEnv: ['MONGODB_URI']
+    args: ['-c', 'mvn package -Dspring.data.mongodb.uri=$MONGODB_URI']
     dir: 'backend'
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
@@ -55,6 +55,10 @@ steps:
   - name: 'gcr.io/gleb-abramov/firebase'
     args: [ 'deploy', '--project=gleb-abramov' ]
     id: Deploy to Firebase
+availableSecrets:
+  secretManager:
+    - versionName: projects/gleb-abramov/secrets/GA_MONGODB_URI/versions/latest
+      env: MONGODB_URI
 options:
   logging: CLOUD_LOGGING_ONLY
 
