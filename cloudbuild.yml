@@ -27,11 +27,10 @@ steps:
       mv frontend/dist backend/src/main/resources/static
   # Print out the mongodb uri variable
   - name: bash
-    secretEnv: [ 'MONGODB_URI' ]
     id: Print out the mongodb uri variable
+    secretEnv: [ 'MONGODB_URI' ]
     script: |
-      echo $$MONGODB_URI > mongodb_uri.txt
-      read MONGODB_URI < mongodb_uri.txt
+      echo $$MONGODB_URI
 #  # Backend: Execute mvn clean install
 #  - name: 'gcr.io/cloud-builders/mvn'
 #    id: 'Backend: Execute mvn clean install'
