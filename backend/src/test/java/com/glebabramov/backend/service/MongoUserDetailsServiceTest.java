@@ -1,7 +1,7 @@
 package com.glebabramov.backend.service;
 
 import com.glebabramov.backend.model.MongoUser;
-import com.glebabramov.backend.model.MongoUserRequest;
+import com.glebabramov.backend.model.MongoUserAuthRequest;
 import com.glebabramov.backend.model.MongoUserResponse;
 import com.glebabramov.backend.repository.MongoUserRepository;
 import org.junit.jupiter.api.BeforeEach;
