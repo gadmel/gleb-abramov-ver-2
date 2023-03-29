@@ -11,6 +11,7 @@
 
 cd ../.. || exit
 gcloud builds submit --config cloudbuild.yml
+cd ../.. || exit
 
 # see the full instructions on how to set up Firebase hosting with Cloud Run
 # https://firebase.google.com/docs/hosting/cloud-run

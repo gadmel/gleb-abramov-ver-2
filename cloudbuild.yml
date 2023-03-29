@@ -13,46 +13,65 @@ steps:
   # Frontend: Execute npm install and run build
   - name: 'gcr.io/cloud-builders/npm'
     id: Install node modules
-    args: ['install']
+    args: [ 'install' ]
     dir: 'frontend'
-    
+
   - name: 'gcr.io/cloud-builders/npm'
     id: Build frontend
-    args: ['run', 'build']
+    args: [ 'run', 'build' ]
     dir: 'frontend'
   # Move dist directory to backend static directory
   - name: bash
     id: Move dist directory to backend static directory
     script: |
       mv frontend/dist backend/src/main/resources/static
-  # Backend: Execute mvn clean install
+  # Print out the mongodb uri variable to ensure it is set
+  - name: bash
+    secretEnv: [ 'MONGODB_URI' ]
+    id: Print out the mongodb uri variable
+    script: |
+      echo $$MONGODB_URI    
+  # Backend: Execute mvn test with dev profile
+  - name: 'gcr.io/cloud-builders/mvn'
+    id: 'Backend: Execute mvn test with dev profile'
+    entrypoint: bash
+    args: [ '-c', 'mvn test -Dspring.profiles.active=dev' ]
+    dir: 'backend'
+  # Backend: Execute 'mvn clean install' skipping tests
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Backend: Execute mvn clean install'
-    entrypoint: mvn
-    args: ['install']
+    secretEnv: [ 'MONGODB_URI' ]
+    entrypoint: bash
+    args: [ '-c', 'mvn clean install -Dspring.data.mongodb.uri=$$MONGODB_URI -DskipTests' ]
     dir: 'backend'
   # Backend: Execute mvn package
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Backend: Execute mvn package'
-    args: ['package']
+    secretEnv: [ 'MONGODB_URI' ]
+    entrypoint: bash
+    args: [ '-c', 'mvn package -Dspring.data.mongodb.uri=$$MONGODB_URI -DskipTests' ]
     dir: 'backend'
   # Build the Docker container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/gleb-abramov/app', '.']
+    args: [ 'build', '-t', 'gcr.io/gleb-abramov/app', '.' ]
     id: Build the Docker container image
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/gleb-abramov/app']
+    args: [ 'push', 'gcr.io/gleb-abramov/app' ]
     id: Push the container image to Google Container Registry
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: ['run', 'deploy', 'app', '--image', 'gcr.io/gleb-abramov/app', '--region', 'europe-central2', '--allow-unauthenticated', '--project', 'gleb-abramov']
+    args: [ 'run', 'deploy', 'app', '--image', 'gcr.io/gleb-abramov/app', '--region', 'europe-central2', '--allow-unauthenticated', '--project', 'gleb-abramov' ]
     id: Deploy container image to Google Cloud Run
   # Deploy to Firebase
   - name: 'gcr.io/gleb-abramov/firebase'
     args: [ 'deploy', '--project=gleb-abramov' ]
     id: Deploy to Firebase
+availableSecrets:
+  secretManager:
+    - versionName: projects/510222405282/secrets/GA_MONGODB_URI/versions/latest
+      env: MONGODB_URI
 options:
   logging: CLOUD_LOGGING_ONLY
 
