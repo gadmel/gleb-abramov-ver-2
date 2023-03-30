@@ -2,7 +2,7 @@ import React, {ChangeEvent, FormEvent, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import Layout from '../Layout/Layout'
 import useAuth from "../../hooks/useAuth";
-import authenticationService from "../../services/authenticationService";
+import adminService from "../../services/adminService";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 
 function Register() {
@@ -26,7 +26,7 @@ function Register() {
 
 	function submitHandler(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
-		authenticationService
+		adminService
 			.register(username, password)
 			.then(() => {
 				setUsername('')

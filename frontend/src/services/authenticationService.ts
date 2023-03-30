@@ -32,14 +32,6 @@ class AuthenticationService {
 			})
 	}
 
-	register(username: string, password: string) {
-		return axios
-			.post('/api/users/register/', {username, password})
-			.then((response: { data: User }) => {
-				return response.data;
-			});
-	}
-
 	getCurrentUser() {
 		return axios
 			.get('/api/users/current/')
