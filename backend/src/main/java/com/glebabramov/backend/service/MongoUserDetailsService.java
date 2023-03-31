@@ -104,6 +104,7 @@ public class MongoUserDetailsService implements UserDetailsService {
 		repository.deleteById(id);
 
 		return new MongoUserResponse(userToDelete.get().id(), userToDelete.get().username(), userToDelete.get().role(), userToDelete.get().associatedResume());
+
 	}
 
 }

@@ -38,6 +38,13 @@ class AdminService {
 			});
 	}
 
+	getAllResumes() {
+		return axios
+			.get('/api/admin/resumes/')
+			.then((response: { data: Resume[] }) => {
+				return response.data;
+			});
+	}
 
 	createResume(name: string, userId: string) {
 		return axios
