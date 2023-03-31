@@ -1,7 +1,6 @@
 package com.glebabramov.backend.controller;
 
 import com.glebabramov.backend.model.MongoUser;
-import com.glebabramov.backend.model.Resume;
 import com.glebabramov.backend.repository.MongoUserRepository;
 import com.glebabramov.backend.repository.ResumeRepository;
 import com.glebabramov.backend.service.IdService;
@@ -23,7 +22,6 @@ import java.security.Principal;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -43,7 +41,6 @@ class ResumeControllerTest {
 	MongoUser adminUser;
 	MongoUser basicUser;
 	String rawPassword = "password";
-	Resume testResume = new Resume("Some ID", "Company name", "Some user id", false, false);
 
 	@BeforeEach
 	void setUp() {
@@ -51,58 +48,6 @@ class ResumeControllerTest {
 		basicUser = new MongoUser("Another ID", "Test user", encoder.encode(rawPassword), "BASIC", "company");
 		when(mockedPrincipal.getName()).thenReturn(adminUser.username());
 		when(idService.generateId()).thenReturn("Some ID");
-	}
-
-	@Nested
-	@DisplayName("GET /api/admin/resumes/")
-	class getAllResumes {
-
-
-		@Test
-		@DirtiesContext
-		@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
-		void getAllResumes_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() throws Exception {
-			mockMvc.perform(get("/api/admin/resumes/"))
-					.andExpect(status().isUnauthorized());
-		}
-
-		@Test
-		@DirtiesContext
-		@WithMockUser(username = "Test user", roles = {"BASIC"})
-		@DisplayName("...should throw 'Forbidden' (403) if the user is not an admin")
-		void getAllResumes_shouldThrow403Forbidden_ifUserIsNotAdmin() throws Exception {
-			// GIVEN
-			mongoUserRepository.save(basicUser);
-			// WHEN
-			mockMvc.perform(get("/api/admin/resumes/"))
-					.andExpect(status().isForbidden());
-		}
-
-		@Test
-		@DirtiesContext
-		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
-		@DisplayName("...should return 'OK' (200) and a list of all resumes if the user is an admin")
-		void getAllResumes_shouldReturn200Ok_andListOfAllResumes_ifUserIsAdmin() throws Exception {
-			// GIVEN
-			mongoUserRepository.save(adminUser);
-			resumeRepository.save(testResume);
-			// WHEN
-			mockMvc.perform(get("/api/admin/resumes/"))
-					.andExpect(status().isOk())
-					.andExpect(content().json("""
-							[
-								{
-									"id": "Some ID",
-									"name": "Company name",
-									"userId": "Some user id",
-									"invitationSent": false,
-									"isPublished": false
-								}
-							]
-							"""
-					));
-		}
-
 	}
 
 	@Nested

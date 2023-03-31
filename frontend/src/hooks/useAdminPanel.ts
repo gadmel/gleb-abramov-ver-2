@@ -16,13 +16,6 @@ function useAdminPanel() {
 			})
 	}, [])
 
-	useEffect(() => {
-		adminService
-			.getAllResumes()
-			.then(incomingResumes => {
-				setResumes(incomingResumes)
-			})
-	}, [])
 
 
 	const usersWithoutResume = users.filter(user => user.associatedResume !== null || user.associatedResume !== "[]")
