@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -15,6 +16,10 @@ import java.security.Principal;
 public class ResumeController {
 	private final ResumeService resumeService;
 
+	@GetMapping("/")
+	public List<Resume> getResumes(Principal principal) {
+		return resumeService.getAllResumes(principal);
+	}
 
 	@PostMapping("/create/")
 	@ResponseStatus(code = HttpStatus.CREATED)

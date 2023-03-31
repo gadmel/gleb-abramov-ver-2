@@ -1,6 +1,7 @@
 @import '../../sass/variables';
 
-.user {
+.user,
+.resume {
 	display: flex;
 	gap: 20px;
 	align-items: center;
@@ -18,7 +19,9 @@
 		text-align: start;
 		min-width: 78px;
 	}
-
+	& > p:last-of-type {
+		margin-left: auto;
+	}
 }
 
 .user__action {

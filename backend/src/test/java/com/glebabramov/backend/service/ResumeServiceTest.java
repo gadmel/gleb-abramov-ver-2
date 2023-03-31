@@ -16,6 +16,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -41,6 +43,7 @@ class ResumeServiceTest {
 	Resume testResume = new Resume("Some ID", "Company name", "Some user id", false,false);
 	ResumeCreateRequest testResumeCreateRequest = new ResumeCreateRequest("Company name", "Some user id");
 	ResponseStatusException unauthorisedUserException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
+	ResponseStatusException forbiddenToViewResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to view all resumes");
 	ResponseStatusException forbiddenToCreateResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to create resumes");
 
 	@BeforeEach
@@ -49,6 +52,56 @@ class ResumeServiceTest {
 		when(mockedPrincipal.getName()).thenReturn(adminUser.username());
 		when(idService.generateId()).thenReturn(testResume.id());
 	}
+
+	@Nested
+	@DisplayName("getAllResumes()")
+	class getAllResumes {
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
+		void getAllResumes_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() {
+			//GIVEN
+			//WHEN
+			ResponseStatusException expected = unauthorisedUserException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.getAllResumes(mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Forbidden' (403) if the user is not an admin")
+		void getAllResumes_shouldThrow403Forbidden_ifUserIsNotAdmin() {
+			//GIVEN
+			mongoUserRepository.save(basicUser);
+			when(mockedPrincipal.getName()).thenReturn(basicUser.username());
+			//WHEN
+			ResponseStatusException expected = forbiddenToViewResumesException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.getAllResumes(mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should return 'OK' (200) and a list of all resumes if the user is an admin")
+		void getAllResumes_shouldReturn200OK_andAListOfAllResumes_ifUserIsAdmin() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			resumeRepository.save(testResume);
+			List<Resume> expected = Arrays.asList(testResume);
+			//WHEN
+			List<Resume> actual = resumeService.getAllResumes(mockedPrincipal);
+			//THEN
+			assertEquals(expected, actual);
+		}
+
+
+	}
+
 
 	@Nested
 	@DisplayName("createResume()")

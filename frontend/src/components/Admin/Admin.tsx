@@ -16,7 +16,7 @@ function Admin() {
 		navigate('/')
 	}
 
-	const {users, setUsers, usersSelectOptions} = useAdminPanel()
+	const {users, setUsers, resumes, usersSelectOptions} = useAdminPanel()
 
 	const handleLogout = () => {
 		authenticationService
@@ -50,7 +50,12 @@ function Admin() {
 						})}
 
 						<h3>Resumes</h3>
-
+						{resumes.map(resume => {
+							return <div className="resume" key={resume.id}>
+								<p>{resume.name}</p>
+								<p>{users.find(user => user.id === resume.userId)?.username}</p>
+							</div>
+						})}
 
 						<CreateResumeForm usersSelectOptions={usersSelectOptions}/>
 
