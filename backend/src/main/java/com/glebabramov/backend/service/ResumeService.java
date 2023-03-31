@@ -22,9 +22,7 @@ public class ResumeService {
 
 	public List<Resume> getAllResumes(Principal principal) {
 		MongoUserResponse currentUser = mongoUserDetailsService.getCurrentUser(principal);
-		if (currentUser == null) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
-		}
+
 		if (!currentUser.role().equals(ADMIN_ROLE)) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to view all resumes");
 		}
@@ -32,17 +30,15 @@ public class ResumeService {
 		return repository.findAll()
 				.stream()
 				.toList();
-
 	}
 
 	public Resume createResume(ResumeCreateRequest resume, Principal principal) {
 		MongoUserResponse currentUser = mongoUserDetailsService.getCurrentUser(principal);
-		if (currentUser == null) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
-		}
+
 		if (!currentUser.role().equals(ADMIN_ROLE)) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to create resumes");
 		}
+
 		Resume newResume = new Resume(idService.generateId(), resume.name(), resume.userId(), false, false);
 		return repository.save(newResume);
 	}
