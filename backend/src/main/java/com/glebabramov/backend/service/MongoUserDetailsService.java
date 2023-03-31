@@ -76,7 +76,6 @@ public class MongoUserDetailsService implements UserDetailsService {
 		}
 
 		MongoUser newUser = new MongoUser(idService.generateId(), user.username(), passwordEncoder.encode(user.password()), "BASIC", "[]");
-
 		MongoUser savedUser = repository.save(newUser);
 
 		return new MongoUserResponse(savedUser.id(), savedUser.username(), savedUser.role(), savedUser.associatedResume());
@@ -101,9 +100,10 @@ public class MongoUserDetailsService implements UserDetailsService {
 		if (userToDelete.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
-		repository.deleteById(id);
-		return new MongoUserResponse(userToDelete.get().id(), userToDelete.get().username(), userToDelete.get().role(), userToDelete.get().associatedResume());
 
+		repository.deleteById(id);
+
+		return new MongoUserResponse(userToDelete.get().id(), userToDelete.get().username(), userToDelete.get().role(), userToDelete.get().associatedResume());
 	}
 
 }

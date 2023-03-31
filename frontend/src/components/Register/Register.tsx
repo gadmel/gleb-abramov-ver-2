@@ -27,7 +27,7 @@ function Register() {
 	function submitHandler(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		adminService
-			.register(username, password)
+			.registerUser(username, password)
 			.then(() => {
 				setUsername('')
 				setPassword('')

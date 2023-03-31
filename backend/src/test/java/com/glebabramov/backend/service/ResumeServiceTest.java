@@ -1,0 +1,100 @@
+package com.glebabramov.backend.service;
+
+import com.glebabramov.backend.model.MongoUser;
+import com.glebabramov.backend.model.Resume;
+import com.glebabramov.backend.model.ResumeCreateRequest;
+import com.glebabramov.backend.repository.MongoUserRepository;
+import com.glebabramov.backend.repository.ResumeRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.security.Principal;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@SpringBootTest
+class ResumeServiceTest {
+
+	@Autowired
+	ResumeRepository resumeRepository;
+	@Autowired
+	MongoUserRepository mongoUserRepository;
+	@Autowired
+	MongoUserDetailsService mongoUserDetailsService;
+	IdService idService = mock(IdService.class);
+	Principal mockedPrincipal = mock(Principal.class);
+	@Autowired
+	ResumeService resumeService;
+
+	MongoUser adminUser = new MongoUser("Some ID", "Admin's name", "Test password", "ADMIN", "[]");
+	MongoUser basicUser = new MongoUser("Some other ID", "Basic user's name", "Test password", "BASIC", "[]");
+
+	Resume testResume = new Resume("Some ID", "Company name", "Some user id", false,false);
+	ResumeCreateRequest testResumeCreateRequest = new ResumeCreateRequest("Company name", "Some user id");
+	ResponseStatusException unauthorisedUserException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
+	ResponseStatusException forbiddenToCreateResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to create resumes");
+
+	@BeforeEach
+	void setUp() {
+		resumeService = new ResumeService(resumeRepository, mongoUserDetailsService, idService);
+		when(mockedPrincipal.getName()).thenReturn(adminUser.username());
+		when(idService.generateId()).thenReturn(testResume.id());
+	}
+
+	@Nested
+	@DisplayName("createResume()")
+	class createResume {
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
+		void createResume_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() {
+			//GIVEN
+			//WHEN
+			ResponseStatusException expected = unauthorisedUserException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.createResume(testResumeCreateRequest, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Forbidden' (403) if the user is not an admin")
+		void createResume_shouldThrow403Forbidden_ifUserIsNotAdmin() {
+			//GIVEN
+			mongoUserRepository.save(basicUser);
+			when(mockedPrincipal.getName()).thenReturn(basicUser.username());
+			//WHEN
+			ResponseStatusException expected = forbiddenToCreateResumesException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.createResume(testResumeCreateRequest, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should return 'Created' (201) and the created resume if the user is an admin")
+		void createResume_shouldReturn201Created_andTheCreatedResume_ifUserIsAdmin() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			Resume expected = testResume;
+			//WHEN
+			Resume actual = resumeService.createResume(testResumeCreateRequest, mockedPrincipal);
+			//THEN
+			assertEquals(expected, actual);
+		}
+
+	}
+
+}
