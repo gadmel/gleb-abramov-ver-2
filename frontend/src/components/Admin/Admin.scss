@@ -1,13 +1,14 @@
 @import '../../sass/variables';
 
-.user {
+.user,
+.resume {
 	display: flex;
 	gap: 20px;
 	align-items: center;
 	width: 100%;
 	min-width: 40vw;
 	border: 1px solid white;
-	border-radius: 8px;
+	border-radius: 4px;
 	padding: 6px 18px;
 	@media (prefers-color-scheme: light) {
 		background: $user-background--light;
@@ -17,6 +18,9 @@
 	& > :first-child {
 		text-align: start;
 		min-width: 78px;
+	}
+	& > p:last-of-type {
+		margin-left: auto;
 	}
 }
 
@@ -40,4 +44,3 @@
 	}
 
 }
-

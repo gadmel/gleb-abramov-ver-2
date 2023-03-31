@@ -1,0 +1,59 @@
+@import "../../sass/variables";
+
+.form {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	border: 1px solid white;
+	border-radius: 4px;
+	gap: 20px;
+	padding: 12px 18px;
+	width: 100%;
+
+	&__input {
+		padding: 6px 12px;
+		border: 1px solid white;
+		border-radius: 4px;
+		color: white;
+		background: 0 center;
+		min-width: 2px;
+		font: inherit;
+		height: fit-content;
+
+		&:focus {
+			outline: 1px solid $button--border--hover;
+			border: 1px solid $button--border--hover;
+		}
+
+		@media (prefers-color-scheme: light) {
+			color: $font-color--light;
+			border: 1px solid $font-color--light;
+			&:focus {
+				outline: 1px solid $font-color--light;
+				border: 1px solid $font-color--light;
+			}
+		}
+	}
+
+	&__button {
+		padding: 6px 12px;
+		border-radius: 4px;
+		font: inherit;
+		min-width: fit-content;
+		white-space: nowrap;
+		cursor: pointer;
+		padding-inline: 26px;
+	}
+
+	& .row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		gap: 20px;
+	}
+
+}

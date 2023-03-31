@@ -17,6 +17,8 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	static final String ADMIN_ROLE = "ADMIN";
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -35,7 +37,9 @@ public class SecurityConfig {
 				.authorizeHttpRequests()
 				.requestMatchers(HttpMethod.GET, "/api/csrf/").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/login/").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/users/register/").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.GET, "/api/admin/users/").hasRole(ADMIN_ROLE)
+				.requestMatchers(HttpMethod.POST, "/api/admin/users/register/").hasRole(ADMIN_ROLE)
+				.requestMatchers("/api/admin/**").hasRole(ADMIN_ROLE)
 				.requestMatchers("/api/**").authenticated()
 				.anyRequest().permitAll()
 				.and()

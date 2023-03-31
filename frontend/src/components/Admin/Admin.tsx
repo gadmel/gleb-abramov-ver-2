@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {useNavigate} from 'react-router-dom'
 import useAuth from "../../hooks/useAuth";
 import Layout from "../Layout/Layout";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
-import authenticationService, {User} from "../../services/authenticationService";
-import adminService from "../../services/adminService";
+import authenticationService from "../../services/authenticationService";
 import DeleteUserButton from "../Buttons/DeleteUserButton";
+import useAdminPanel from "../../hooks/useAdminPanel";
+import CreateResumeForm from "../Forms/CreateResumeForm";
 
 function Admin() {
 	const user = useAuth(true)
@@ -15,15 +16,7 @@ function Admin() {
 		navigate('/')
 	}
 
-	const [users, setUsers] = useState<User[]>([])
-
-	useEffect(() => {
-		adminService
-			.getAllUsers()
-			.then(incomingUsers => {
-				setUsers(incomingUsers)
-			})
-	}, [])
+	const {users, setUsers, resumes, usersSelectOptions} = useAdminPanel()
 
 	const handleLogout = () => {
 		authenticationService
@@ -43,6 +36,7 @@ function Admin() {
 				: <section id="restricted">
 					<div className="full-screen-unit">
 						<h2>Admin</h2>
+
 						<h3>Users</h3>
 						{users.map(user => {
 							return (
@@ -54,7 +48,18 @@ function Admin() {
 								</div>
 							)
 						})}
-						<button onClick={() => navigate('/secured/register/')}>Register</button>
+
+						<h3>Resumes</h3>
+						{resumes.map(resume => {
+							return <div className="resume" key={resume.id}>
+								<p>{resume.name}</p>
+								<p>{users.find(user => user.id === resume.userId)?.username}</p>
+							</div>
+						})}
+
+						<CreateResumeForm usersSelectOptions={usersSelectOptions}/>
+
+						<button onClick={() => navigate('/secured/register/')}>Register a user</button>
 						<button onClick={handleLogout}>Log out</button>
 					</div>
 				</section>

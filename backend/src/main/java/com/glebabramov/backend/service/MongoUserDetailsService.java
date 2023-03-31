@@ -2,6 +2,7 @@ package com.glebabramov.backend.service;
 
 import com.glebabramov.backend.model.MongoUser;
 import com.glebabramov.backend.model.MongoUserAuthRequest;
+import com.glebabramov.backend.model.MongoUserRequest;
 import com.glebabramov.backend.model.MongoUserResponse;
 import com.glebabramov.backend.repository.MongoUserRepository;
 
@@ -76,7 +77,6 @@ public class MongoUserDetailsService implements UserDetailsService {
 		}
 
 		MongoUser newUser = new MongoUser(idService.generateId(), user.username(), passwordEncoder.encode(user.password()), "BASIC", "[]");
-
 		MongoUser savedUser = repository.save(newUser);
 
 		return new MongoUserResponse(savedUser.id(), savedUser.username(), savedUser.role(), savedUser.associatedResume());
@@ -101,7 +101,9 @@ public class MongoUserDetailsService implements UserDetailsService {
 		if (userToDelete.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
+
 		repository.deleteById(id);
+
 		return new MongoUserResponse(userToDelete.get().id(), userToDelete.get().username(), userToDelete.get().role(), userToDelete.get().associatedResume());
 
 	}
