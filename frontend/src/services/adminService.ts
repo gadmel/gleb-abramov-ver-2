@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User } from './authenticationService';
+import {User} from './authenticationService';
 
 export interface Resume {
 	id: string;
@@ -49,6 +49,14 @@ class AdminService {
 	createResume(name: string, userId: string) {
 		return axios
 			.post('/api/admin/resumes/create/', {name, userId})
+			.then((response: { data: Resume }) => {
+				return response.data;
+			});
+	}
+
+	deleteResume(id: string) {
+		return axios
+			.delete(`/api/admin/resumes/delete/${id}/`)
 			.then((response: { data: Resume }) => {
 				return response.data;
 			});

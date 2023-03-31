@@ -41,10 +41,13 @@ class ResumeServiceTest {
 	MongoUser basicUser = new MongoUser("Some other ID", "Basic user's name", "Test password", "BASIC", "[]");
 
 	Resume testResume = new Resume("Some ID", "Company name", "Some user id", false,false);
+	String testResumeId = testResume.id();
 	ResumeCreateRequest testResumeCreateRequest = new ResumeCreateRequest("Company name", "Some user id");
 	ResponseStatusException unauthorisedUserException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
 	ResponseStatusException forbiddenToViewResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to view all resumes");
 	ResponseStatusException forbiddenToCreateResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to create resumes");
+	ResponseStatusException forbiddenToDeleteResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to delete resumes");
+	ResponseStatusException resumeNotFoundException = new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found");
 
 	@BeforeEach
 	void setUp() {
@@ -102,7 +105,6 @@ class ResumeServiceTest {
 
 	}
 
-
 	@Nested
 	@DisplayName("createResume()")
 	class createResume {
@@ -146,6 +148,71 @@ class ResumeServiceTest {
 			Resume actual = resumeService.createResume(testResumeCreateRequest, mockedPrincipal);
 			//THEN
 			assertEquals(expected, actual);
+		}
+
+	}
+
+	@Nested
+	@DisplayName("deleteResume()")
+	class deleteResume {
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
+		void deleteResume_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() {
+			//WHEN
+			ResponseStatusException expected = unauthorisedUserException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.deleteResume(testResumeId, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Forbidden' (403) if the user is not an admin")
+		void deleteResume_shouldThrow403Forbidden_ifUserIsNotAdmin() {
+			//GIVEN
+			mongoUserRepository.save(basicUser);
+			when(mockedPrincipal.getName()).thenReturn(basicUser.username());
+			//WHEN
+			ResponseStatusException expected = forbiddenToDeleteResumesException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.deleteResume(testResumeId, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should return 'Not Found' (404) if the resume does not exist and the user is an admin")
+		void deleteResume_shouldReturn404NotFound_ifResumeDoesNotExistAndUserIsAdmin() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			//WHEN
+			ResponseStatusException expected = resumeNotFoundException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.deleteResume(testResumeId, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should delete the resume, return 'OK' (200) and the deleted resume if the resume exists and the user is an admin")
+		void deleteResume_shouldDeleteResume_andReturnIt_ifResumeExistsAndUserIsAdmin() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			resumeRepository.save(testResume);
+			Resume expected = testResume;
+			//WHEN
+			Resume actual = resumeService.deleteResume(testResume.id(), mockedPrincipal);
+			//THEN
+			assertEquals(expected, actual);
+			resumeRepository.findById(testResume.id()).ifPresentOrElse(
+					resume -> fail("Resume was not deleted"),
+					() -> assertTrue(true)
+			);
 		}
 
 	}

@@ -1,7 +1,23 @@
 const selectStyles = {
 	container: (provided: any) => ({
 		...provided,
-		width: '100%',
+		width: '100%'
+	}),
+	singleValue: (provided: any) => ({
+		...provided,
+		textAlign: 'start'
+	}),
+	placeholder: (provided: any) => ({
+		...provided,
+		textAlign: 'start'
+	}),
+}
+
+const wideScreenSelectStyles = {
+	...selectStyles,
+	container: (provided: any) => ({
+		...provided,
+		width: '50%'
 	}),
 }
 
@@ -34,4 +50,4 @@ const selectTheme = (theme: any) => ({
 		: lightColors,
 })
 
-export {selectStyles, selectTheme}
+export {selectStyles, wideScreenSelectStyles, selectTheme}
