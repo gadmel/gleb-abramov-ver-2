@@ -16,6 +16,18 @@
 
 	}
 
+	&__title {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+		font-size: calc(0.6em + 0.8vw);
+		cursor: pointer;
+
+		&:hover {
+			color: $button--border--hover;
+		}
+	}
+
 	&__input {
 		padding: 6px 12px;
 		border: 1px solid white;
@@ -27,9 +39,6 @@
 		height: fit-content;
 		box-sizing: border-box;
 		width: 100%;
-		@media (min-width: $form--row-breakpoint) {
-			width: 50%;
-		}
 
 		&:focus {
 			outline: 1px solid $button--border--hover;
@@ -50,23 +59,21 @@
 		padding: 6px 12px;
 		border-radius: 4px;
 		font: inherit;
-		min-width: fit-content;
+		width: 100%;
 		white-space: nowrap;
 		cursor: pointer;
-		padding-inline: 26px;
 	}
 
-	& .row {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
+	&__block {
 		width: 100%;
+		display: grid;
+		grid-template-columns: 1fr;
 		gap: 20px;
-		flex-wrap: wrap;
-		@media (min-width: $form--row-breakpoint) {
-			flex-wrap: nowrap;
+
+		&.hidden {
+			display: none;
 		}
 
 	}
+
 }

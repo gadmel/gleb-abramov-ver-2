@@ -1,0 +1,20 @@
+@import "../../sass/variables";
+.action-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+
+	&--delete {
+		margin-left: auto;
+		color: $user-delete;
+	}
+
+	&--cancel {
+		@media (prefers-color-scheme: light) {
+			color: $user-delete--cancel--light;
+			font-size: larger;
+		}
+	}
+
+}
