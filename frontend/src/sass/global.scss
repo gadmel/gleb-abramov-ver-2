@@ -43,7 +43,10 @@ body {
 			display: flex;
 			flex-direction: column;
 			max-width: 1280px;
-			margin: auto auto;
+			margin: auto 0;
+			@media (min-width: 1280px) {
+				margin: auto auto;
+			}
 			align-items: center;
 			text-align: center;
 			justify-content: center;
@@ -129,9 +132,11 @@ button {
 .overhead {
 	position: absolute;
 	top: calc(1em + 2vw);
+
 	&.right {
 		right: calc(1em + 2vw);
 	}
+
 	&.left {
 		left: calc(1em + 2vw);
 	}

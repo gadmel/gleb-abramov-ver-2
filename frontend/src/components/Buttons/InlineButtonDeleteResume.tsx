@@ -4,7 +4,6 @@ import adminService, {Resume} from "../../services/adminService";
 
 type Props = {
 	id: string
-	value: Resume[]
 	setValue: React.Dispatch<React.SetStateAction<Resume[]>>
 }
 
@@ -13,7 +12,7 @@ const DeleteButtonResume = (props: Props) => {
 		adminService
 			.deleteResume(props.id)
 			.then((incomingDeletedResume) => {
-				props.setValue(props.value.filter((resume: Resume) => resume.id !== incomingDeletedResume.id))
+				props.setValue((prevResumes: Resume[]) => prevResumes.filter((resume: Resume) => resume.id !== incomingDeletedResume.id))
 			})
 	}
 
