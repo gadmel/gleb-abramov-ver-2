@@ -1,5 +1,7 @@
 import React from "react";
 import {useNavigate} from 'react-router-dom'
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faBackward, faHouse} from "@fortawesome/free-solid-svg-icons";
 import Layout from "../Layout/Layout";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import DeleteButtonUser from "../Buttons/InlineButtonDeleteUser";
@@ -32,6 +34,19 @@ function Admin() {
 
 	return (
 		<Layout title="Admin control panel">
+
+			<aside className="overhead left">
+				<button className="overhead--button" onClick={() => navigate("/")}>
+					<FontAwesomeIcon icon={faHouse} size="2xl"/>
+				</button>
+			</aside>
+
+			<aside className="overhead right">
+				<button className="overhead--button" onClick={() => navigate(-1)}>
+					<FontAwesomeIcon icon={faBackward} size="2xl"/>
+				</button>
+			</aside>
+
 			{!user
 				? <LoadingScreen/>
 				: <section id="restricted">

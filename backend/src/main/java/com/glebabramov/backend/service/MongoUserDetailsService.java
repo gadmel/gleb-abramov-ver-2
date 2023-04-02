@@ -1,8 +1,6 @@
 package com.glebabramov.backend.service;
 
-import com.glebabramov.backend.model.MongoUser;
-import com.glebabramov.backend.model.MongoUserAuthRequest;
-import com.glebabramov.backend.model.MongoUserResponse;
+import com.glebabramov.backend.model.*;
 import com.glebabramov.backend.repository.MongoUserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +23,9 @@ public class MongoUserDetailsService implements UserDetailsService {
 	private final MongoUserRepository repository;
 	private final IdService idService;
 	private final PasswordEncoder passwordEncoder;
+	private final AuthorisationService authorisationService = new AuthorisationService(this);
+	private final ValidationService validationService;
+	private final VerificationService verificationService;
 	private static final String ADMIN_ROLE = "ADMIN";
 	UsernameNotFoundException userNotFoundException = new UsernameNotFoundException("User not found");
 
@@ -46,34 +46,16 @@ public class MongoUserDetailsService implements UserDetailsService {
 	}
 
 	public List<MongoUserResponse> getAllUsers(Principal principal) {
-
-		MongoUserResponse currentUser = getCurrentUser(principal);
-		if (!currentUser.role().equals(ADMIN_ROLE)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to view all users");
-		}
-
+		authorisationService.isAuthorisedByRole(ADMIN_ROLE, principal, "view all users");
 		return repository.findAll().stream()
 				.map(user -> new MongoUserResponse(user.id(), user.username(), user.role(), user.associatedResume()))
 				.toList();
 	}
 
 	public MongoUserResponse register(MongoUserAuthRequest user, Principal principal) {
-
-		MongoUserResponse currentUser = getCurrentUser(principal);
-		if (!currentUser.role().equals(ADMIN_ROLE)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to register new users");
-		}
-
-		if (user.username() == null || user.username().length() == 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
-		}
-		if (user.password() == null || user.password().length() == 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
-		}
-
-		if (repository.existsByUsername(user.username())) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
-		}
+		authorisationService.isAuthorisedByRole(ADMIN_ROLE, principal, "register users");
+		validationService.validateMongoUserAuthRequest(user);
+		verificationService.userDoesNotExistByUsername(user.username());
 
 		MongoUser newUser = new MongoUser(idService.generateId(), user.username(), passwordEncoder.encode(user.password()), "BASIC", "[]");
 		MongoUser savedUser = repository.save(newUser);
@@ -81,30 +63,13 @@ public class MongoUserDetailsService implements UserDetailsService {
 		return new MongoUserResponse(savedUser.id(), savedUser.username(), savedUser.role(), savedUser.associatedResume());
 	}
 
-	public MongoUserResponse deleteUser(String id, Principal principal) {
-
-		if (principal == null) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
-		}
-
-		MongoUserResponse currentUser = getCurrentUser(principal);
-		if (!currentUser.role().equals(ADMIN_ROLE)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to delete users");
-		}
-
-		if (id == null || id.length() == 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is required");
-		}
-
-		Optional<MongoUser> userToDelete = repository.findById(id);
-		if (userToDelete.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
-		}
+	public MongoUserResponse delete(String id, Principal principal) {
+		authorisationService.isAuthorisedByRole(ADMIN_ROLE, principal, "delete users");
+		validationService.validateIdRequest(id);
+		MongoUser userToDelete = verificationService.userDoesExistById(id);
 
 		repository.deleteById(id);
-
-		return new MongoUserResponse(userToDelete.get().id(), userToDelete.get().username(), userToDelete.get().role(), userToDelete.get().associatedResume());
-
+		return new MongoUserResponse(userToDelete.id(), userToDelete.username(), userToDelete.role(), userToDelete.associatedResume());
 	}
 
 }

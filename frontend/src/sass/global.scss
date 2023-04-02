@@ -126,6 +126,40 @@ button {
 
 }
 
+.overhead {
+	position: absolute;
+	top: calc(1em + 2vw);
+	&.right {
+		right: calc(1em + 2vw);
+	}
+	&.left {
+		left: calc(1em + 2vw);
+	}
+
+	&--button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-width: calc(2.7em + 1.5vw);
+		min-height: calc(2.7em + 1.5vw);
+		border: 2px solid $font-color--legal--value;
+		padding: 0;
+		font-weight: bold;
+		font-size: calc(1.2em + 1vw);
+		line-height: 1;
+		color: $background--personal--light;
+
+		@media (prefers-color-scheme: light) {
+			background: #ffffff;
+		}
+
+		&:hover {
+			background: initial;
+		}
+	}
+
+}
+
 
 // Light mode adjustments
 

@@ -30,9 +30,10 @@ class ResumeServiceTest {
 	ResumeRepository resumeRepository;
 	@Autowired
 	MongoUserRepository mongoUserRepository;
-	@Autowired
-	MongoUserDetailsService mongoUserDetailsService;
 	IdService idService = mock(IdService.class);
+	@Autowired
+	AuthorisationService authorisationService;
+	@Autowired VerificationService verificationService;
 	Principal mockedPrincipal = mock(Principal.class);
 	@Autowired
 	ResumeService resumeService;
@@ -51,7 +52,7 @@ class ResumeServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		resumeService = new ResumeService(resumeRepository, mongoUserDetailsService, idService);
+		resumeService = new ResumeService(resumeRepository, idService, authorisationService, verificationService);
 		when(mockedPrincipal.getName()).thenReturn(adminUser.username());
 		when(idService.generateId()).thenReturn(testResume.id());
 	}
