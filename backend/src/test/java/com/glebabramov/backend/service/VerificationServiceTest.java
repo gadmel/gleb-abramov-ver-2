@@ -131,7 +131,6 @@ class VerificationServiceTest {
 			assertEquals(expected, actual);
 		}
 
-
 	}
 
 }

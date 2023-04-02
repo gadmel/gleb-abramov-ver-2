@@ -1,6 +1,7 @@
 package com.glebabramov.backend.controller;
 
 import com.glebabramov.backend.model.MongoUserAuthRequest;
+import com.glebabramov.backend.model.MongoUserRequest;
 import com.glebabramov.backend.model.MongoUserResponse;
 import com.glebabramov.backend.service.MongoUserDetailsService;
 
@@ -36,6 +37,11 @@ public class MongoUserController {
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public MongoUserResponse register(@RequestBody MongoUserAuthRequest user, Principal principal) {
 		return mongoUserDetailsService.register(user, principal);
+	}
+
+	@PutMapping("/admin/users/update/")
+	public MongoUserResponse update(@RequestBody MongoUserRequest user, Principal principal) {
+		return mongoUserDetailsService.update(user, principal);
 	}
 
 	@DeleteMapping("/admin/users/delete/{id}/")

@@ -38,8 +38,8 @@ class ResumeServiceTest {
 	@Autowired
 	ResumeService resumeService;
 
-	MongoUser adminUser = new MongoUser("Some ID", "Admin's name", "Test password", "ADMIN", "[]");
-	MongoUser basicUser = new MongoUser("Some other ID", "Basic user's name", "Test password", "BASIC", "[]");
+	MongoUser adminUser = new MongoUser("Some ID", "Admin's name", "Test password", "ADMIN", "8c687299-9ab7-4f68-8fd9-3de3c521227e");
+	MongoUser basicUser = new MongoUser("Some other ID", "Basic user's name", "Test password", "BASIC", "8c687299-9ab7-4f68-8fd9-3de3c521227e");
 
 	Resume testResume = new Resume("Some ID", "Company name", "Some user id", false,false);
 	String testResumeId = testResume.id();
