@@ -25,7 +25,6 @@ class CsrfControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/csrf/"))
 				.andExpect(status().isOk())
 				.andExpect(cookie().exists("XSRF-TOKEN"))
-				.andExpect(content().string("CSRF Secured"))
-		;
+				.andExpect(content().string("CSRF Secured"));
 	}
 }

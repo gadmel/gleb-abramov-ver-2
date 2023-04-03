@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -42,4 +43,21 @@ public class ResumeService {
 		Resume newResume = new Resume(idService.generateId(), resume.name(), resume.userId(), false, false);
 		return repository.save(newResume);
 	}
+
+	public Resume deleteResume(String id, Principal principal) {
+		MongoUserResponse currentUser = mongoUserDetailsService.getCurrentUser(principal);
+
+		if (!currentUser.role().equals(ADMIN_ROLE)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to delete resumes");
+		}
+
+		Optional<Resume> resume = repository.findById(id);
+		if (resume.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found");
+		}
+
+		repository.deleteById(id);
+		return resume.get();
+	}
+
 }

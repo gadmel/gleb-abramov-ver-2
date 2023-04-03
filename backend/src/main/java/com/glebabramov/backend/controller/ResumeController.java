@@ -26,4 +26,10 @@ public class ResumeController {
 	public Resume createResume(@RequestBody ResumeCreateRequest resume, Principal principal) {
 		return resumeService.createResume(resume, principal);
 	}
+
+	@DeleteMapping("/delete/{id}/")
+	public Resume deleteResume(@PathVariable("id") String id, Principal principal) {
+		return resumeService.deleteResume(id, principal);
+	}
+
 }
