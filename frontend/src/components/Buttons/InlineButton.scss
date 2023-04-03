@@ -8,22 +8,23 @@
 	gap: 20px;
 	margin-left: auto;
 }
-	.action-button {
-		background: none;
-		border: none;
-		cursor: pointer;
-		padding: 0;
 
-		&--delete {
-			color: $user-delete;
-			margin-left: auto;
-		}
+.action-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
 
-		&--cancel {
-			@media (prefers-color-scheme: light) {
-				color: $user-delete--cancel--light;
-				font-size: larger;
-			}
+	&--delete {
+		color: $user-delete;
+		margin-left: auto;
+	}
+
+	&--cancel {
+		@media (prefers-color-scheme: light) {
+			color: $user-delete--cancel--light;
+			font-size: larger;
 		}
+	}
 
 }
