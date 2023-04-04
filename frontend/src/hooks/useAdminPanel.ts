@@ -11,6 +11,10 @@ function useAdminPanel() {
 	const [associatedResumeOptions, setAssociatedResumeOptions] = useState<SelectOption[]>([])
 	const [usersSelectOptions, setUsersSelectOptions] = useState<SelectOption[]>([])
 
+	useEffect(() => {
+		refreshData()
+	}, [])
+
 	const refreshUsers = () => {
 		adminService
 			.getAllUsers()
@@ -40,21 +44,7 @@ function useAdminPanel() {
 		refreshResumes()
 	}
 
-	useEffect(() => {
-		refreshUsers()
-		refreshResumes()
-	}, [])
-
-
-	return {
-		users,
-		setUsers,
-		resumes,
-		setResumes,
-		usersSelectOptions,
-		associatedResumeOptions,
-		refreshData
-	}
+	return {users, resumes, usersSelectOptions, associatedResumeOptions, refreshData}
 }
 
 export default useAdminPanel
