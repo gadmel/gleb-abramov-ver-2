@@ -543,7 +543,7 @@ class MongoUserControllerTest {
 					MongoUser.class);
 			// AND
 			Set<String> expectedStandardResumesUserIds = standardResume.userIds().stream()
-					.filter(userId -> userId.equals(basicUser.id()))
+					.filter(userId -> !userId.equals(basicUser.id()))
 					.collect(Collectors.toSet());
 			Resume expectedSideEffect1 = new Resume(STANDARD_RESUME_ID, standardResume.name(), expectedStandardResumesUserIds, standardResume.invitationSent(), standardResume.isPublished());
 			Resume actualSideEffect1 = resumeRepository.findById(STANDARD_RESUME_ID).get();
@@ -651,7 +651,7 @@ class MongoUserControllerTest {
 					.andExpect(jsonPath("$.password").doesNotExist());
 			// AND
 			Set<String> expectedStandardResumesUserIds = standardResume.userIds().stream()
-					.filter(userId -> userId.equals(basicUser.id()))
+					.filter(userId -> !userId.equals(basicUser.id()))
 					.collect(Collectors.toSet());
 			Resume expectedSideEffect = new Resume(STANDARD_RESUME_ID, standardResume.name(), expectedStandardResumesUserIds, standardResume.invitationSent(), standardResume.isPublished());
 			Resume actualSideEffect = resumeRepository.findById(STANDARD_RESUME_ID).get();
