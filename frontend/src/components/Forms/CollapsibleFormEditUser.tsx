@@ -2,16 +2,15 @@ import React, {useState} from 'react'
 import {useMediaQuery} from "react-responsive";
 import Select from "react-select";
 import CollapsibleForm from "./CollapsibleForm";
-import adminService, {Resume} from "../../services/adminService";
+import adminService from "../../services/adminService";
 import {User} from "../../services/authenticationService";
 import {SelectOption, selectStyles, selectTheme} from "../Selects/SelectStyles";
 
 type Props = {
 	user: User
-	setUsers: React.Dispatch<React.SetStateAction<User[]>>
 	setEditUser: React.Dispatch<React.SetStateAction<string | null>>
+	refreshData: () => void
 	associatedResumeOptions: SelectOption[]
-	setResumes: React.Dispatch<React.SetStateAction<Resume[]>>
 }
 
 function CollapsibleFormEditUser(props: Props) {
@@ -24,22 +23,8 @@ function CollapsibleFormEditUser(props: Props) {
 		event.preventDefault()
 		adminService
 			.updateUser(props.user.id, updatedUsername, updatedAssociatedResume)
-			.then((incomingUpdatedUser) => {
-				props.setUsers(prevUsers => prevUsers.map((user: User) =>
-					user.id === incomingUpdatedUser.id
-						? incomingUpdatedUser
-						: user))
-				props.setResumes(prevResumes => prevResumes.map((resume: Resume) =>
-					resume.id === updatedAssociatedResume
-						? {...resume, userIds: [...resume.userIds, props.user.id]}
-						: resume.userIds.includes(props.user.id)
-							? resume.userIds.includes(updatedAssociatedResume)
-								? {...resume, userIds: resume.userIds.filter((userId: string) => userId !== props.user.id)}
-								: {...resume, userIds: [...resume.userIds, props.user.id].filter((userId: string) => userId !== props.user.id)}
-							: resume
-				))
-				props.setEditUser(null)
-			})
+			.then(() => props.refreshData())
+			.finally(() => props.setEditUser(null))
 	}
 
 	return (
