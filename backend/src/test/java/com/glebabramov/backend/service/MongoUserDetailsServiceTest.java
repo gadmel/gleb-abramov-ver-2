@@ -21,10 +21,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -51,10 +49,11 @@ class MongoUserDetailsServiceTest {
 
 	Principal mockedPrincipal = mock(Principal.class);
 
-	MongoUser adminUser = new MongoUser("Some ID", "Admin's name", "Test password", "ADMIN", "8c687299-9ab7-4f68-8fd9-3de3c521227e");
-	MongoUser basicUser = new MongoUser("Some other ID", "Basic user's name", "Test password", "BASIC", "8c687299-9ab7-4f68-8fd9-3de3c521227e");
-	Resume adminUserResume = new Resume("8c687299-9ab7-4f68-8fd9-3de3c521227e", "Some other ID", "Basic user's name", false, false);
-
+	String STANDARD_RESUME_ID = "8c687299-9ab7-4f68-8fd9-3de3c521227e";
+	MongoUser adminUser = new MongoUser("Some-ID", "Admin's name", "Test password", "ADMIN", STANDARD_RESUME_ID);
+	MongoUser basicUser = new MongoUser("Some-other-ID", "Basic user's name", "Test password", "BASIC", STANDARD_RESUME_ID);
+	Resume standardResume = new Resume(STANDARD_RESUME_ID, "Standard resume", Set.of("Some-ID", "Some-other-ID"), false, false);
+	Resume otherResume = new Resume("Some-other-resumes-ID", "Another resume", Set.of(), false, false);
 	MongoUserResponse responseDTO = new MongoUserResponse(adminUser.id(), adminUser.username(), adminUser.role(), adminUser.associatedResume());
 	MongoUserAuthRequest requestDTO = new MongoUserAuthRequest(adminUser.username(), adminUser.password());
 	MongoUserAuthRequest basicAuthRequestDTO = new MongoUserAuthRequest(basicUser.username(), basicUser.password());
@@ -70,8 +69,14 @@ class MongoUserDetailsServiceTest {
 	ResponseStatusException forbiddenToGetAllUsersException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to view all users");
 	ResponseStatusException forbiddenToUpdateUserException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to update users");
 	ResponseStatusException forbiddenToDeleteUserException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to delete users");
+	ResponseStatusException forbiddenToDeleteAdminException = new ResponseStatusException(HttpStatus.FORBIDDEN, "Admins cannot be deleted");
 	ResponseStatusException userDoesNotExistException = new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
-	ResponseStatusException associatedResumeDoesNotExistException = new ResponseStatusException(HttpStatus.NOT_FOUND, "Associated resume does not exist");
+	ResponseStatusException standardResumeDoesNotExistException = new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Secondary condition not met, because resume with id " + STANDARD_RESUME_ID + " does not exist");
+	String NON_EXISTENT_RESUME_ID = "Some-non-existent-resume-id";
+	ResponseStatusException associatedResumeDoesNotExistException = new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Secondary condition not met, because resume with id " + NON_EXISTENT_RESUME_ID + " does not exist");
+	ResponseStatusException invalidRequestIdException = new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is required");
+	ResponseStatusException invalidRequestUsernameException = new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
+	ResponseStatusException invalidRequestAssociatedResumeException = new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associated resume is required");
 
 
 	@BeforeEach
@@ -80,7 +85,7 @@ class MongoUserDetailsServiceTest {
 		mongoUserRepository.findByUsername(adminUser.username()).ifPresent(mongoUserRepository::delete);
 		mongoUserRepository.findByUsername(basicUser.username()).ifPresent(mongoUserRepository::delete);
 		when(mockedPrincipal.getName()).thenReturn(adminUser.username());
-		when(idService.generateId()).thenReturn(adminUser.id());
+		when(idService.generateId()).thenReturn(basicUser.id());
 	}
 
 	@Nested
@@ -233,18 +238,39 @@ class MongoUserDetailsServiceTest {
 
 		@Test
 		@DirtiesContext
-		@DisplayName("...should return a MongoUserResponseDTO of the created user if username does not exist and provided username amd password are not empty")
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the standard resume does not exist")
+		void register_shouldThrowUnprocessableEntity422_ifStandardResumeDoesNotExist() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			MongoUserAuthRequest requestDTOBasicUser = new MongoUserAuthRequest(basicUser.username(), basicUser.password());
+			//WHEN
+			ResponseStatusException expected = standardResumeDoesNotExistException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.register(requestDTOBasicUser, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should return a MongoUserResponseDTO of the created user if username does not exist and provided username and password are not empty")
 		void register_shouldReturnMongoUserResponseDTOAndCreated201_ifUsernameDoesNotExistAndProvidedUsernameAndPasswordAreNotEmpty() {
 			//GIVEN
 			mongoUserRepository.save(adminUser);
 			MongoUserAuthRequest requestDTOBasicUser = new MongoUserAuthRequest(basicUser.username(), basicUser.password());
 			MongoUserResponse responseDTOBasicUser = new MongoUserResponse(basicUser.id(), basicUser.username(), basicUser.role(), basicUser.associatedResume());
-			when(idService.generateId()).thenReturn(basicUser.id());
+			resumeRepository.save(standardResume);
 			//WHEN
 			MongoUserResponse expected = responseDTOBasicUser;
 			MongoUserResponse actual = mongoUserDetailsService.register(requestDTOBasicUser, mockedPrincipal);
+
+			Set<String> expectedUserIds = new HashSet<>(standardResume.userIds());
+			expectedUserIds.add(basicUser.id());
+			Resume expectedSideEffect = new Resume(standardResume.id(), standardResume.name(), expectedUserIds, false, false);
+			Resume actualSideEffect = resumeRepository.findById(STANDARD_RESUME_ID).get();
 			//THEN
 			assertEquals(expected, actual);
+			assertEquals(expectedSideEffect, actualSideEffect);
 		}
 
 	}
@@ -335,6 +361,44 @@ class MongoUserDetailsServiceTest {
 
 		@Test
 		@DirtiesContext
+		@DisplayName("...should throw 'Bad Request' (400) if the user's id, username or associated resume is missing or empty")
+		void updateUser_shouldThrow400BadRequest_ifUpdateRequestIsInvalid() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			mongoUserRepository.save(basicUser);
+			MongoUserRequest requestDTOInvalidId1 = new MongoUserRequest(null, basicUser.username(), basicUser.associatedResume());
+			MongoUserRequest requestDTOInvalidId2 = new MongoUserRequest("", basicUser.username(), basicUser.associatedResume());
+			MongoUserRequest requestDTOInvalidUsername1 = new MongoUserRequest(basicUser.id(), null, basicUser.associatedResume());
+			MongoUserRequest requestDTOInvalidUsername2 = new MongoUserRequest(basicUser.id(), "", basicUser.associatedResume());
+			MongoUserRequest requestDTOInvalidResume1 = new MongoUserRequest(basicUser.id(), basicUser.username(), null);
+			MongoUserRequest requestDTOInvalidResume2 = new MongoUserRequest(basicUser.id(), basicUser.username(), "");
+			//WHEN
+			ResponseStatusException expectedId = invalidRequestIdException;
+			ResponseStatusException expectedUsername = invalidRequestUsernameException;
+			ResponseStatusException expectedResume = invalidRequestAssociatedResumeException;
+			ResponseStatusException actualId1 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.update(requestDTOInvalidId1, mockedPrincipal));
+			ResponseStatusException actualId2 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.update(requestDTOInvalidId2, mockedPrincipal));
+			ResponseStatusException actualUsername1 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.update(requestDTOInvalidUsername1, mockedPrincipal));
+			ResponseStatusException actualUsername2 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.update(requestDTOInvalidUsername2, mockedPrincipal));
+			ResponseStatusException actualResume1 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.update(requestDTOInvalidResume1, mockedPrincipal));
+			ResponseStatusException actualResume2 = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.update(requestDTOInvalidResume2, mockedPrincipal));
+			//THEN
+			assertEquals(expectedId.getClass(), actualId1.getClass());
+			assertEquals(expectedId.getMessage(), actualId1.getMessage());
+			assertEquals(expectedId.getClass(), actualId2.getClass());
+			assertEquals(expectedId.getMessage(), actualId2.getMessage());
+			assertEquals(expectedUsername.getClass(), actualUsername1.getClass());
+			assertEquals(expectedUsername.getMessage(), actualUsername1.getMessage());
+			assertEquals(expectedUsername.getClass(), actualUsername2.getClass());
+			assertEquals(expectedUsername.getMessage(), actualUsername2.getMessage());
+			assertEquals(expectedResume.getClass(), actualResume1.getClass());
+			assertEquals(expectedResume.getMessage(), actualResume1.getMessage());
+			assertEquals(expectedResume.getClass(), actualResume2.getClass());
+			assertEquals(expectedResume.getMessage(), actualResume2.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
 		@DisplayName("...should throw 'Not Found' (404) if the user does not exist")
 		void updateUser_shouldThrow404NotFound_ifUserDoesNotExist() {
 			//GIVEN
@@ -351,12 +415,32 @@ class MongoUserDetailsServiceTest {
 		@Test
 		@DirtiesContext
 		@WithMockUser(username = "admin", roles = "ADMIN")
-		@DisplayName("...should throw 'Not Found' (404) if the user's associated resume does not exist")
-		void updateUser_shouldThrow404NotFound_ifAssociatedResumeDoesNotExist() {
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user's to update new associated resume does not exist and thus cannot assigned to the user")
+		void updateUser_shouldThrow422UnprocessableEntity_ifNewAssociatedResumeDoesNotExist() {
 			//GIVEN
 			mongoUserRepository.save(adminUser);
 			mongoUserRepository.save(basicUser);
 			MongoUserRequest requestDTO = new MongoUserRequest(basicUser.id(), basicUser.username(), basicUser.associatedResume());
+			//WHEN
+			ResponseStatusException expected = standardResumeDoesNotExistException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.update(requestDTO, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "admin", roles = "ADMIN")
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user's to update previous associated resume does not exist and thus cannot be unassigned from the user")
+			// Redundant: tests the behaviour, which cannot occur so long only the prescribed methods are used to manipulate data (data has not been corrupted through direct access to the database)
+		void updateUser_shouldThrow422UnprocessableEntity_ifPreviousAssociatedResumeDoesNotExist() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			MongoUser corruptedUser = new MongoUser(basicUser.id(), basicUser.username(), basicUser.password(), basicUser.role(), NON_EXISTENT_RESUME_ID);
+			mongoUserRepository.save(corruptedUser);
+			resumeRepository.save(otherResume);
+			MongoUserRequest requestDTO = new MongoUserRequest(corruptedUser.id(), corruptedUser.username(), otherResume.id());
 			//WHEN
 			ResponseStatusException expected = associatedResumeDoesNotExistException;
 			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.update(requestDTO, mockedPrincipal));
@@ -373,15 +457,28 @@ class MongoUserDetailsServiceTest {
 			//GIVEN
 			mongoUserRepository.save(adminUser);
 			mongoUserRepository.save(basicUser);
-			resumeRepository.save(adminUserResume);
-			MongoUserRequest requestDTO = new MongoUserRequest(basicUser.id(), adminUser.username(), adminUserResume.id());
-			MongoUserResponse expected = new MongoUserResponse(basicUser.id(), adminUser.username(), basicUser.role(), adminUserResume.id());
+			resumeRepository.save(standardResume);
+			resumeRepository.save(otherResume);
+			MongoUserRequest requestDTO = new MongoUserRequest(basicUser.id(), "Altered username", otherResume.id());
 			//WHEN
+			MongoUserResponse expected = new MongoUserResponse(basicUser.id(), "Altered username", basicUser.role(), otherResume.id());
 			MongoUserResponse actual = mongoUserDetailsService.update(requestDTO, mockedPrincipal);
+			MongoUser expectedEffect = new MongoUser(basicUser.id(), "Altered username", basicUser.password(), basicUser.role(), otherResume.id());
+			MongoUser actualEffect = mongoUserRepository.findById(basicUser.id()).get();
+			Set<String> expectedOtherResumesUserIds = new HashSet<>(otherResume.userIds());
+			expectedOtherResumesUserIds.add(basicUser.id());
+			Set<String> expectedStandardResumesUserIds = new HashSet<>(standardResume.userIds());
+			expectedStandardResumesUserIds.remove(basicUser.id());
+			Resume expectedSideEffect1 = new Resume(otherResume.id(), otherResume.name(), expectedOtherResumesUserIds, otherResume.invitationSent(), otherResume.isPublished());
+			Resume actualSideEffect1 = resumeRepository.findById(otherResume.id()).get();
+			Resume expectedSideEffect2 = new Resume(standardResume.id(), standardResume.name(), expectedStandardResumesUserIds, standardResume.invitationSent(), standardResume.isPublished());
+			Resume actualSideEffect2 = resumeRepository.findById(standardResume.id()).get();
 			//THEN
 			assertEquals(expected, actual);
+			assertEquals(expectedEffect, actualEffect);
+			assertEquals(expectedSideEffect1, actualSideEffect1);
+			assertEquals(expectedSideEffect2, actualSideEffect2);
 		}
-
 
 	}
 
@@ -423,20 +520,24 @@ class MongoUserDetailsServiceTest {
 
 		@Test
 		@DirtiesContext
-		@DisplayName("...should delete the user if the user is an admin")
-		void deleteUser_shouldDeleteUser_ifUserIsAdmin() {
+		@DisplayName("...should throw 'Bad Request' (400) if the user's to delete id is invalid")
+		void deleteUser_shouldThrowBadRequest400_ifUserIdIsInvalid() {
 			//GIVEN
 			mongoUserRepository.save(adminUser);
-			mongoUserRepository.save(basicUser);
 			//WHEN
-			mongoUserDetailsService.delete(basicUser.id(), mockedPrincipal);
+			ResponseStatusException expected = idIsRequiredException;
+			ResponseStatusException actualWithoutId = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.delete("", mockedPrincipal));
+			ResponseStatusException actualWithIdNull = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.delete(null, mockedPrincipal));
 			//THEN
-			assertFalse(mongoUserRepository.existsById(basicUser.id()));
+			assertEquals(expected.getClass(), actualWithoutId.getClass());
+			assertEquals(expected.getMessage(), actualWithoutId.getMessage());
+			assertEquals(expected.getClass(), actualWithIdNull.getClass());
+			assertEquals(expected.getMessage(), actualWithIdNull.getMessage());
 		}
 
 		@Test
 		@DirtiesContext
-		@DisplayName("...should throw 'Not Found' (404) if the user does not exist")
+		@DisplayName("...should throw 'Not Found' (404) if the user to delete does not exist")
 		void deleteUser_shouldThrowNotFound404_ifUserDoesNotExist() {
 			//GIVEN
 			mongoUserRepository.save(adminUser);
@@ -451,19 +552,55 @@ class MongoUserDetailsServiceTest {
 
 		@Test
 		@DirtiesContext
-		@DisplayName("...should throw 'Bad Request' (400) if the user id is invalid")
-		void deleteUser_shouldThrowBadRequest400_ifUserIdIsInvalid() {
+		@DisplayName("...should throw 'Forbidden' (403) if the user is an admin but the user to delete is an admin")
+		void deleteUser_shouldThrowForbidden403_ifUserToDeleteIsAdmin() {
 			//GIVEN
 			mongoUserRepository.save(adminUser);
+			String validId = adminUser.id();
 			//WHEN
-			ResponseStatusException expected = idIsRequiredException;
-			ResponseStatusException actualWithoutId = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.delete("", mockedPrincipal));
-			ResponseStatusException actualWithIdNull = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.delete(null, mockedPrincipal));
+			ResponseStatusException expected = forbiddenToDeleteAdminException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.delete(validId, mockedPrincipal));
 			//THEN
-			assertEquals(expected.getClass(), actualWithoutId.getClass());
-			assertEquals(expected.getMessage(), actualWithoutId.getMessage());
-			assertEquals(expected.getClass(), actualWithIdNull.getClass());
-			assertEquals(expected.getMessage(), actualWithIdNull.getMessage());
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
 		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user to delete exists but its associated resume does not exist")
+		void deleteUser_shouldThrowUnprocessableEntity422_ifUserDoesExistAndAssociatedResumeDoesNotExist() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			mongoUserRepository.save(basicUser);
+			//WHEN
+			ResponseStatusException expected = standardResumeDoesNotExistException;
+			String basicUserId = basicUser.id();
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> mongoUserDetailsService.delete(basicUserId, mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should delete the user, unassign him from his associated resume's user IDs and return the deleted user if the user is an admin, the user to delete exists and is not an admin and its associated resume exists")
+		void deleteUser_shouldDeleteUserAndUnassignHimFromHisResume_andReturnDeletedUser_ifUserDoesExistAndIsNotAdminAndAssociatedResumeExists() {
+			//GIVEN
+			mongoUserRepository.save(adminUser);
+			mongoUserRepository.save(basicUser);
+			resumeRepository.save(standardResume);
+			//WHEN
+			MongoUserResponse expected = mongoUserDetailsService.delete(basicUser.id(), mockedPrincipal);
+			MongoUserResponse actual = new MongoUserResponse(basicUser.id(), basicUser.username(), basicUser.role(), standardResume.id());
+			Set<String> expectedAssociatedStandardResumeUserIds = standardResume.userIds().stream().filter(id -> !id.equals(basicUser.id())).collect(Collectors.toSet());
+			Resume expectedSideEffect = new Resume(standardResume.id(), standardResume.name(), expectedAssociatedStandardResumeUserIds, standardResume.invitationSent(), standardResume.isPublished());
+			Resume actualSideEffect = resumeRepository.findById(standardResume.id()).get();
+			//THEN
+			assertEquals(expected, actual);
+			assertFalse(mongoUserRepository.existsById(basicUser.id()));
+			assertEquals(expectedSideEffect, actualSideEffect);
+		}
+
 	}
+
 }

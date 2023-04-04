@@ -4,28 +4,36 @@ import Select from "react-select";
 import adminService, {Resume} from "../../services/adminService";
 import CollapsibleForm from "./CollapsibleForm";
 import {SelectOption, selectStyles, selectTheme} from "../Selects/SelectStyles";
+import {User} from "../../services/authenticationService";
 
 type Props = {
 	usersSelectOptions: SelectOption[]
 	setResumes: React.Dispatch<React.SetStateAction<Resume[]>>
+	setUsers: React.Dispatch<React.SetStateAction<User[]>>
+	refreshResumes: () => void
 }
 
 function CollapsibleFormCreateResume(props: Props) {
 	const systemPrefersLight = useMediaQuery({query: '(prefers-color-scheme: light)'})
 
 	const [newResumeName, setNewResumeName] = useState<string>('')
-	const [newResumeUserId, setNewResumeUserId] = useState<string>('')
+	const [newResumeUserIds, setNewResumeUserIds] = useState<string[]>([])
 
 	const handleCreateResume = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		adminService
-			.createResume(newResumeName, newResumeUserId)
-			.then(resume => {
-				props.setResumes((prevResumes: Resume[]) => [...prevResumes, resume])
+			.createResume(newResumeName, newResumeUserIds)
+			.then((incomingCreatedResume: Resume) => {
+				props.refreshResumes()
+				props.setUsers((prevUsers: User[]) => prevUsers.map((user: User) =>
+					newResumeUserIds.includes(user.id)
+						? {...user, associatedResume: incomingCreatedResume.id}
+						: user
+				))
 			})
 			.finally(() => {
 				setNewResumeName('')
-				setNewResumeUserId('')
+				setNewResumeUserIds([])
 			})
 	}
 
@@ -36,9 +44,10 @@ function CollapsibleFormCreateResume(props: Props) {
 					 value={newResumeName}
 					 onChange={event => setNewResumeName(event.target.value)}
 			/>
-			<Select options={props.usersSelectOptions}
-					  value={props.usersSelectOptions.find(option => option.value === newResumeUserId) || null}
-					  onChange={option => option !== null && setNewResumeUserId(option.value)}
+			<Select isMulti
+					  options={props.usersSelectOptions}
+					  value={props.usersSelectOptions.filter(option => newResumeUserIds.includes(option.value)) || null}
+					  onChange={options => setNewResumeUserIds(options.map(option => option.value))}
 					  className="user-select"
 					  classNamePrefix="user-select"
 					  styles={selectStyles}

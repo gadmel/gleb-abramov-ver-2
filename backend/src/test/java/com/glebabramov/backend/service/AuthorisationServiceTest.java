@@ -36,10 +36,10 @@ class AuthorisationServiceTest {
 	final String UNAUTHORISED_ROLE = "Some irrelevant role";
 	String RESTRICTION = "fulfill this action";
 	MongoUser basicUser = new MongoUser("Some-ID", "Basic user", "Test-password", UNAUTHORISED_ROLE, "associatedResumeId");
-	MongoUserResponse basicUserResponse = new MongoUserResponse(basicUser.id(),basicUser.username(), basicUser.role(), basicUser.associatedResume());
+	MongoUserResponse basicUserResponse = new MongoUserResponse(basicUser.id(), basicUser.username(), basicUser.role(), basicUser.associatedResume());
 	User basicUserDetails = new User(basicUser.username(), basicUser.password(), List.of(new SimpleGrantedAuthority(basicUser.role())));
 	MongoUser authorisedUser = new MongoUser("Some-ID-2", "Authorised user", "Test-password", ROLE, "associatedResumeId");
-	MongoUserResponse authorisedUserResponse = new MongoUserResponse(authorisedUser.id(),authorisedUser.username(), authorisedUser.role(), authorisedUser.associatedResume());
+	MongoUserResponse authorisedUserResponse = new MongoUserResponse(authorisedUser.id(), authorisedUser.username(), authorisedUser.role(), authorisedUser.associatedResume());
 	User authorisedUserDetails = new User(authorisedUser.username(), authorisedUser.password(), List.of(new SimpleGrantedAuthority(authorisedUser.role())));
 	ResponseStatusException userNotLoggedInException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
 	ResponseStatusException userNotAuthorisedException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to " + RESTRICTION);
@@ -76,7 +76,6 @@ class AuthorisationServiceTest {
 			assertDoesNotThrow(() -> authorisationService.isAuthorised(mockedPrincipalBasicUser));
 		}
 
-
 	}
 
 	@Nested
@@ -87,7 +86,7 @@ class AuthorisationServiceTest {
 		void isAuthorisedByRole_shouldThrow401Unauthorized_ifUserIsNotLoggedIn() {
 			//WHEN
 			ResponseStatusException expected = userNotLoggedInException;
-			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> authorisationService.isAuthorisedByRole(ROLE, null, RESTRICTION));
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> authorisationService.isAuthorisedByRole(ROLE, RESTRICTION, null));
 			//THEN
 			assertEquals(expected.getClass(), actual.getClass());
 			assertEquals(expected.getMessage(), actual.getMessage());
@@ -99,7 +98,7 @@ class AuthorisationServiceTest {
 		void isAuthorisedByRole_shouldThrow403Forbidden_ifUserIsLoggedInButNotAuthorised() {
 			//WHEN
 			ResponseStatusException expected = userNotAuthorisedException;
-			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> authorisationService.isAuthorisedByRole(ROLE, mockedPrincipalBasicUser, RESTRICTION));
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> authorisationService.isAuthorisedByRole(ROLE, RESTRICTION, mockedPrincipalBasicUser));
 			//THEN
 			assertEquals(expected.getClass(), actual.getClass());
 			assertEquals(expected.getMessage(), actual.getMessage());
@@ -110,7 +109,7 @@ class AuthorisationServiceTest {
 		@DisplayName("... should not throw any exception if user is logged in and authorised to fulfil the action")
 		void isAuthorisedByRole_shouldNotThrowAnyException_ifUserIsLoggedInAndAuthorised() {
 			//WHEN
-			assertDoesNotThrow(() -> authorisationService.isAuthorisedByRole(ROLE, mockedPrincipalAuthorisedUser, RESTRICTION));
+			assertDoesNotThrow(() -> authorisationService.isAuthorisedByRole(ROLE, RESTRICTION, mockedPrincipalAuthorisedUser));
 		}
 
 	}
