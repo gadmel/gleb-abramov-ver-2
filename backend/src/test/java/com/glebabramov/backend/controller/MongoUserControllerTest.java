@@ -185,7 +185,6 @@ class MongoUserControllerTest {
 
 		}
 
-
 		@Test
 		@DirtiesContext
 		@WithMockUser(username = "Test admin", roles = "ADMIN")
@@ -249,7 +248,6 @@ class MongoUserControllerTest {
 					)
 					.andExpect(status().isUnprocessableEntity());
 		}
-
 
 		@Test
 		@DirtiesContext
@@ -468,7 +466,7 @@ class MongoUserControllerTest {
 		@Test
 		@DirtiesContext
 		@WithMockUser(username = "Test admin", roles = "ADMIN")
-		@DisplayName("... should return 'Unprocessable Entity' (422) iqf the user associated resume is not found by ID")
+		@DisplayName("... should return 'Unprocessable Entity' (422) if the user associated resume is not found by ID")
 		void updateUser_shouldReturnUnprocessableEntity422_ifTheUserAssociatedResumeDoesNotExist() throws Exception {
 			// GIVEN
 			mongoUserRepository.save(adminUser);
