@@ -7,8 +7,8 @@ import {SelectOption} from "../Selects/SelectStyles";
 
 type Props = {
 	user: User
-	setUsers: React.Dispatch<React.SetStateAction<User[]>>
 	setEditUser: React.Dispatch<React.SetStateAction<string | null>>
+	refreshData: () => void
 	associatedResumeOptions: SelectOption[]
 }
 
@@ -22,7 +22,7 @@ function UserListItem(props: Props) {
 				<button className="action-button action-button--cancel" onClick={() => props.setEditUser(props.user.id)}>
 					<FontAwesomeIcon icon={faEdit}/>
 				</button>
-				<DeleteButtonUser id={props.user.id} role={props.user.role} setValue={props.setUsers}/>
+				<DeleteButtonUser id={props.user.id} role={props.user.role} refreshData={props.refreshData} />
 			</div>
 		</div>
 	)

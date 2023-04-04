@@ -1,16 +1,13 @@
 import React, {useState} from 'react';
 import {useMediaQuery} from 'react-responsive'
 import Select from "react-select";
-import adminService, {Resume} from "../../services/adminService";
+import adminService from "../../services/adminService";
 import CollapsibleForm from "./CollapsibleForm";
 import {SelectOption, selectStyles, selectTheme} from "../Selects/SelectStyles";
-import {User} from "../../services/authenticationService";
 
 type Props = {
 	usersSelectOptions: SelectOption[]
-	setResumes: React.Dispatch<React.SetStateAction<Resume[]>>
-	setUsers: React.Dispatch<React.SetStateAction<User[]>>
-	refreshResumes: () => void
+	refreshData: () => void
 }
 
 function CollapsibleFormCreateResume(props: Props) {
@@ -23,14 +20,7 @@ function CollapsibleFormCreateResume(props: Props) {
 		event.preventDefault()
 		adminService
 			.createResume(newResumeName, newResumeUserIds)
-			.then((incomingCreatedResume: Resume) => {
-				props.refreshResumes()
-				props.setUsers((prevUsers: User[]) => prevUsers.map((user: User) =>
-					newResumeUserIds.includes(user.id)
-						? {...user, associatedResume: incomingCreatedResume.id}
-						: user
-				))
-			})
+			.then(() => props.refreshData())
 			.finally(() => {
 				setNewResumeName('')
 				setNewResumeUserIds([])

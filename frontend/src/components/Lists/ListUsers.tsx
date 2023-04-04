@@ -3,13 +3,11 @@ import {User} from "../../services/authenticationService";
 import UserListItem from "./ListItemUser";
 import CollapsibleFormEditUser from "../Forms/CollapsibleFormEditUser";
 import {SelectOption} from "../Selects/SelectStyles";
-import {Resume} from "../../services/adminService";
 
 type Props = {
 	users: User[]
-	setUsers: React.Dispatch<React.SetStateAction<User[]>>
 	associatedResumeOptions: SelectOption[]
-	setResumes: React.Dispatch<React.SetStateAction<Resume[]>>
+	refreshData: () => void
 }
 
 function UsersList(props: Props) {
@@ -21,15 +19,12 @@ function UsersList(props: Props) {
 			{props.users.map((user: User) => {
 					return (editUser === user.id)
 						? <CollapsibleFormEditUser key={user.id}
-															user={user}
-															setUsers={props.setUsers}
-															setEditUser={setEditUser}
-															associatedResumeOptions={props.associatedResumeOptions}
-															setResumes={props.setResumes}/>
+															user={user} setEditUser={setEditUser}
+															refreshData={props.refreshData}
+															associatedResumeOptions={props.associatedResumeOptions}/>
 						: <UserListItem key={user.id}
-											 user={user}
-											 setUsers={props.setUsers}
-											 setEditUser={setEditUser}
+											 user={user} setEditUser={setEditUser}
+											 refreshData={props.refreshData}
 											 associatedResumeOptions={props.associatedResumeOptions}/>
 				}
 			)}

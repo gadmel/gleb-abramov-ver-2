@@ -35,11 +35,13 @@ function useAdminPanel() {
 			})
 	}
 
-	useEffect(() => {
+	const refreshData = () => {
 		refreshUsers()
-	}, [])
+		refreshResumes()
+	}
 
 	useEffect(() => {
+		refreshUsers()
 		refreshResumes()
 	}, [])
 
@@ -51,8 +53,7 @@ function useAdminPanel() {
 		setResumes,
 		usersSelectOptions,
 		associatedResumeOptions,
-		refreshUsers,
-		refreshResumes
+		refreshData
 	}
 }
 
