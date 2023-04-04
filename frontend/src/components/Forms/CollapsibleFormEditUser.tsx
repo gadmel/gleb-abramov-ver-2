@@ -29,14 +29,17 @@ function CollapsibleFormEditUser(props: Props) {
 					user.id === incomingUpdatedUser.id
 						? incomingUpdatedUser
 						: user))
-
+				props.setResumes(prevResumes => prevResumes.map((resume: Resume) =>
+					resume.id === updatedAssociatedResume
+						? {...resume, userIds: [...resume.userIds, props.user.id]}
+						: resume.userIds.includes(props.user.id)
+							? resume.userIds.includes(updatedAssociatedResume)
+								? {...resume, userIds: resume.userIds.filter((userId: string) => userId !== props.user.id)}
+								: {...resume, userIds: [...resume.userIds, props.user.id].filter((userId: string) => userId !== props.user.id)}
+							: resume
+				))
+				props.setEditUser(null)
 			})
-		props.setResumes(prevResumes => prevResumes.map((resume: Resume) =>
-			resume.userId === props.user.id
-				? {...resume, userId: updatedAssociatedResume}
-				: resume))
-		props.setEditUser(null)
-
 	}
 
 	return (

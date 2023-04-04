@@ -1,4 +1,6 @@
 package com.glebabramov.backend.model;
 
-public record ResumeCreateRequest(String name, String userId) {
+import java.util.Set;
+
+public record ResumeCreateRequest(String name, Set<String> userIds) {
 }

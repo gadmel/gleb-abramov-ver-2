@@ -11,20 +11,19 @@ function useAdminPanel() {
 	const [associatedResumeOptions, setAssociatedResumeOptions] = useState<SelectOption[]>([])
 	const [usersSelectOptions, setUsersSelectOptions] = useState<SelectOption[]>([])
 
-	useEffect(() => {
+	const refreshUsers = () => {
 		adminService
 			.getAllUsers()
 			.then((incomingUsers: User[]) => {
 				setUsers(incomingUsers)
 				setUsersSelectOptions(incomingUsers
-					.filter((user: User) => !users.map((userInARow: User) => userInARow.associatedResume).includes(user.associatedResume))
 					.map((user: User) => {
 						return {label: user.username, value: user.id}
 					}))
 			})
-	}, [])
+	}
 
-	useEffect(() => {
+	const refreshResumes = () => {
 		adminService
 			.getAllResumes()
 			.then((incomingResumes: Resume[]) => {
@@ -34,11 +33,27 @@ function useAdminPanel() {
 						return {label: resume.name, value: resume.id}
 					}))
 			})
+	}
+
+	useEffect(() => {
+		refreshUsers()
+	}, [])
+
+	useEffect(() => {
+		refreshResumes()
 	}, [])
 
 
-	return {users, setUsers, resumes, setResumes, usersSelectOptions, associatedResumeOptions}
-
+	return {
+		users,
+		setUsers,
+		resumes,
+		setResumes,
+		usersSelectOptions,
+		associatedResumeOptions,
+		refreshUsers,
+		refreshResumes
+	}
 }
 
 export default useAdminPanel

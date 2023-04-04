@@ -4,7 +4,7 @@ import {User} from './authenticationService';
 export interface Resume {
 	id: string;
 	name: string;
-	userId: string;
+	userIds: string[];
 	invitationSent: boolean;
 	isPublished: boolean;
 }
@@ -54,9 +54,9 @@ class AdminService {
 			});
 	}
 
-	createResume(name: string, userId: string) {
+	createResume(name: string, userIds: string[]) {
 		return axios
-			.post('/api/admin/resumes/create/', {name, userId})
+			.post('/api/admin/resumes/create/', {name, userIds})
 			.then((response: { data: Resume }) => {
 				return response.data;
 			});

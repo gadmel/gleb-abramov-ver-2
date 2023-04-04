@@ -11,7 +11,7 @@ function LegalNotice() {
 
 	return (
 		<Layout title="Legal Notice">
-			<aside className="overhead">
+			<aside className="overhead right">
 				<button className="overhead--button" onClick={() => navigate("/")}>
 					<FontAwesomeIcon icon={faXmark} size="2xl" />
 				</button>
