@@ -13,14 +13,6 @@ const selectStyles = {
 	}),
 }
 
-const wideScreenSelectStyles = {
-	...selectStyles,
-	container: (provided: any) => ({
-		...provided,
-		width: '50%'
-	}),
-}
-
 const darkColors = {
 	neutral0: "#242424",
 	neutral20: "#fff",
@@ -50,4 +42,4 @@ const selectTheme = (theme: any) => ({
 		: lightColors,
 })
 
-export {selectStyles, wideScreenSelectStyles, selectTheme}
+export {selectStyles, selectTheme}

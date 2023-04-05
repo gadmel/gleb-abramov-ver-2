@@ -1,5 +1,7 @@
 import React, {ChangeEvent, FormEvent, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faBackward} from "@fortawesome/free-solid-svg-icons";
 import Layout from '../Layout/Layout'
 import useAuth from "../../hooks/useAuth";
 import adminService from "../../services/adminService";
@@ -40,6 +42,13 @@ function Register() {
 
 	return (
 		<Layout title="Register new user">
+
+			<aside className="overhead right">
+				<button className="overhead--button" onClick={() => navigate(-1)}>
+					<FontAwesomeIcon icon={faBackward} size="2xl" />
+				</button>
+			</aside>
+
 			{!user
 				? <LoadingScreen/>
 				: <section id="register">

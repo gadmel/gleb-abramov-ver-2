@@ -40,7 +40,7 @@ public class MongoUserController {
 
 	@DeleteMapping("/admin/users/delete/{id}/")
 	public MongoUserResponse delete(@PathVariable String id, Principal principal) {
-		return mongoUserDetailsService.deleteUser(id, principal);
+		return mongoUserDetailsService.delete(id, principal);
 	}
 
 }
