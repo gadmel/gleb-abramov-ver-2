@@ -4,13 +4,14 @@ import Select from "react-select";
 import CollapsibleForm from "./CollapsibleForm";
 import adminService from "../../services/adminService";
 import {User} from "../../services/authenticationService";
-import {SelectOption, selectStyles, selectTheme} from "../Selects/SelectStyles";
+import {SelectOptionType} from "../Selects/SelectOption";
+import {selectStyles, selectTheme} from "../Selects/SelectStyles";
 
 type Props = {
 	user: User
 	setEditUser: React.Dispatch<React.SetStateAction<string | null>>
 	refreshData: () => void
-	associatedResumeOptions: SelectOption[]
+	associatedResumeOptions: SelectOptionType[]
 }
 
 function CollapsibleFormEditUser(props: Props) {

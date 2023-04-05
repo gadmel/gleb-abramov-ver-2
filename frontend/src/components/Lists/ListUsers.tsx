@@ -2,11 +2,11 @@ import React, {useState} from 'react'
 import {User} from "../../services/authenticationService";
 import UserListItem from "./ListItemUser";
 import CollapsibleFormEditUser from "../Forms/CollapsibleFormEditUser";
-import {SelectOption} from "../Selects/SelectStyles";
+import {SelectOptionType} from "../Selects/SelectOption";
 
 type Props = {
 	users: User[]
-	associatedResumeOptions: SelectOption[]
+	associatedResumeOptions: SelectOptionType[]
 	refreshData: () => void
 }
 
