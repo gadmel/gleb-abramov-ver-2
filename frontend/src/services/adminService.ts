@@ -30,6 +30,14 @@ class AdminService {
 			});
 	}
 
+	updateUser(id: string, username: string, associatedResume: string) {
+		return axios
+			.put(`/api/admin/users/update/`, {id, username, associatedResume})
+			.then((response: { data: User }) => {
+				return response.data;
+			});
+	}
+
 	deleteUser(id: string) {
 		return axios
 			.delete(`/api/admin/users/delete/${id}/`)

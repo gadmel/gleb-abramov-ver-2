@@ -6,7 +6,6 @@ import adminService from "../../services/adminService";
 type Props = {
 	id: string
 	role: string
-	value: User[]
 	setValue: React.Dispatch<React.SetStateAction<User[]>>
 }
 
@@ -17,7 +16,7 @@ const DeleteButtonUser = (props: Props) => {
 		adminService
 			.deleteUser(props.id)
 			.then((incomingDeletedUser) => {
-				props.setValue(props.value.filter((user: User) => user.id !== incomingDeletedUser.id))
+				props.setValue((prevUsers: User[]) => prevUsers.filter((user: User) => user.id !== incomingDeletedUser.id))
 			})
 	}
 

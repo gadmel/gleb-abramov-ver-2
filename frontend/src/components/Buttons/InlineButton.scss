@@ -1,4 +1,14 @@
 @import "../../sass/variables";
+
+.action-controls {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 20px;
+	margin-left: auto;
+}
+
 .action-button {
 	background: none;
 	border: none;
@@ -6,8 +16,8 @@
 	padding: 0;
 
 	&--delete {
-		margin-left: auto;
 		color: $user-delete;
+		margin-left: auto;
 	}
 
 	&--cancel {
