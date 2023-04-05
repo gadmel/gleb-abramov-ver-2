@@ -23,9 +23,7 @@ public class ResumeService {
 
 	public List<Resume> getAllResumes(Principal principal) {
 		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "view all resumes", principal);
-		return repository.findAll()
-				.stream()
-				.toList();
+		return repository.findAll();
 	}
 
 	public Resume createResume(ResumeCreateRequest resume, Principal principal) {

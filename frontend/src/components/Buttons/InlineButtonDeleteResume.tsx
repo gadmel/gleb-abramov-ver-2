@@ -1,6 +1,6 @@
 import React from 'react'
 import DeleteButton from "./InlineButtonDelete";
-import adminService, {} from "../../services/adminService";
+import adminService from "../../services/adminService";
 
 type Props = {
 	id: string

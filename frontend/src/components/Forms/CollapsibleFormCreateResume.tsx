@@ -3,10 +3,11 @@ import {useMediaQuery} from 'react-responsive'
 import Select from "react-select";
 import adminService from "../../services/adminService";
 import CollapsibleForm from "./CollapsibleForm";
-import {SelectOption, selectStyles, selectTheme} from "../Selects/SelectStyles";
+import {SelectOptionType} from "../Selects/SelectOption";
+import {selectStyles, selectTheme} from "../Selects/SelectStyles";
 
 type Props = {
-	usersSelectOptions: SelectOption[]
+	usersSelectOptions: SelectOptionType[]
 	refreshData: () => void
 }
 
@@ -36,7 +37,7 @@ function CollapsibleFormCreateResume(props: Props) {
 			/>
 			<Select isMulti
 					  options={props.usersSelectOptions}
-					  value={props.usersSelectOptions.filter(option => newResumeUserIds.includes(option.value)) || null}
+					  value={props.usersSelectOptions.filter((option: SelectOptionType) => newResumeUserIds.includes(option.value)) || null}
 					  onChange={options => setNewResumeUserIds(options.map(option => option.value))}
 					  className="user-select"
 					  classNamePrefix="user-select"

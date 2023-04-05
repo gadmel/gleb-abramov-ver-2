@@ -44,9 +44,4 @@ const selectTheme = (theme: any) => ({
 		: lightColors,
 })
 
-export type SelectOption = {
-	value: string
-	label: string
-}
-
 export {selectStyles, selectTheme}

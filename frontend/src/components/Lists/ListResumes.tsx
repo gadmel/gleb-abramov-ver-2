@@ -2,13 +2,13 @@ import {Resume} from "../../services/adminService";
 import DeleteButtonResume from "../Buttons/InlineButtonDeleteResume";
 import {User} from "../../services/authenticationService";
 import CollapsibleFormCreateResume from "../Forms/CollapsibleFormCreateResume";
-import {SelectOption} from "../Selects/SelectStyles";
+import {SelectOptionType} from "../Selects/SelectOption";
 
 type Props = {
 	resumes: Resume[]
 	users: User[]
 	refreshData: () => void
-	usersSelectOptions: SelectOption[]
+	usersSelectOptions: SelectOptionType[]
 }
 
 function ListResumes(props: Props) {
@@ -37,4 +37,5 @@ function ListResumes(props: Props) {
 		</>
 	)
 }
+
 export default ListResumes
