@@ -279,7 +279,7 @@ class ResumeControllerTest {
 			@DirtiesContext
 			@WithMockUser(username = "Test admin", roles = {"ADMIN"})
 			@DisplayName("...should delete resume, return 'OK' (200) and the deleted resume if the user is an admin and the resume does exist")
-			void deleteResume_shouldDeleteResumeAndReassignResumeToItsUsers_return200OK_andDeletedResume_ifUserIsAdminAndResumeExists() throws Exception {
+			void deleteResume_shouldDeleteResumeAndReassignResumeToItsUsers_andReturn200OK_ifUserIsAdminAndResumeExists() throws Exception {
 				// GIVEN
 				resumeRepository.save(testResume);
 				mongoUserRepository.save(testResumeAssignedUser);
