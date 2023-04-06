@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,23 +20,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-@SpringBootTest
 class AuthorisationServiceTest {
 
 	MongoUserDetailsService mongoUserDetailsService = mock(MongoUserDetailsService.class);
 	Principal mockedPrincipalBasicUser = mock(Principal.class);
 	Principal mockedPrincipalAuthorisedUser = mock(Principal.class);
 
-	@Autowired
 	AuthorisationService authorisationService;
 
 	final String ROLE = "Some role to restrict by";
 	final String UNAUTHORISED_ROLE = "Some irrelevant role";
 	String RESTRICTION = "fulfill this action";
-	MongoUser basicUser = new MongoUser("Some-ID", "Basic user", "Test-password", UNAUTHORISED_ROLE, "associatedResumeId");
+	MongoUser basicUser = new MongoUser("Some-ID", "Basic user", "Test-password", UNAUTHORISED_ROLE, "associated-resume-id");
 	MongoUserResponse basicUserResponse = new MongoUserResponse(basicUser.id(), basicUser.username(), basicUser.role(), basicUser.associatedResume());
 	User basicUserDetails = new User(basicUser.username(), basicUser.password(), List.of(new SimpleGrantedAuthority(basicUser.role())));
-	MongoUser authorisedUser = new MongoUser("Some-ID-2", "Authorised user", "Test-password", ROLE, "associatedResumeId");
+	MongoUser authorisedUser = new MongoUser("Some-ID-2", "Authorised user", "Test-password", ROLE, "associated-resume-id");
 	MongoUserResponse authorisedUserResponse = new MongoUserResponse(authorisedUser.id(), authorisedUser.username(), authorisedUser.role(), authorisedUser.associatedResume());
 	User authorisedUserDetails = new User(authorisedUser.username(), authorisedUser.password(), List.of(new SimpleGrantedAuthority(authorisedUser.role())));
 	ResponseStatusException userNotLoggedInException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
@@ -71,9 +67,13 @@ class AuthorisationServiceTest {
 		}
 
 		@Test
-		@DisplayName("... should not throw any exception if user is logged in")
-		void isAuthorised_shouldNotThrowAnyException_ifUserIsLoggedIn() {
-			assertDoesNotThrow(() -> authorisationService.isAuthorised(mockedPrincipalBasicUser));
+		@DisplayName("... should return true if user is logged in")
+		void isAuthorised_shouldReturnTrue_ifUserIsLoggedIn() {
+			//WHEN
+			boolean expected = true;
+			boolean actual = authorisationService.isAuthorised(mockedPrincipalBasicUser);
+			//THEN
+			assertEquals(expected, actual);
 		}
 
 	}
@@ -106,10 +106,13 @@ class AuthorisationServiceTest {
 
 		@Test
 		@WithMockUser(username = "Authorised user", roles = ROLE)
-		@DisplayName("... should not throw any exception if user is logged in and authorised to fulfil the action")
-		void isAuthorisedByRole_shouldNotThrowAnyException_ifUserIsLoggedInAndAuthorised() {
+		@DisplayName("... should return true if user is logged in and authorised to fulfil the action")
+		void isAuthorisedByRole_shouldReturnTrue_ifUserIsLoggedInAndAuthorised() {
 			//WHEN
-			assertDoesNotThrow(() -> authorisationService.isAuthorisedByRole(ROLE, RESTRICTION, mockedPrincipalAuthorisedUser));
+			boolean expected = true;
+			boolean actual = authorisationService.isAuthorisedByRole(ROLE, RESTRICTION, mockedPrincipalAuthorisedUser);
+			//THEN
+			assertEquals(expected, actual);
 		}
 
 	}

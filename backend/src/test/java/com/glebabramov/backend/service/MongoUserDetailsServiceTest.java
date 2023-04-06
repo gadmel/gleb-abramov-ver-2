@@ -39,8 +39,8 @@ class MongoUserDetailsServiceTest {
 
 	String STANDARD_RESUME_ID = "8c687299-9ab7-4f68-8fd9-3de3c521227e";
 	String NON_EXISTENT_RESUME_ID = "Some-non-existent-resume-id";
-	String ADMIN_ID = "Some-ID";
-	String BASIC_ID = "Some-other-ID";
+	String ADMIN_ID = "Some-admin-user-ID";
+	String BASIC_ID = "Some-other-user-ID";
 	Resume standardResume = new Resume(STANDARD_RESUME_ID, "Standard resume", Set.of(ADMIN_ID, BASIC_ID), false, false);
 	Resume otherResume = new Resume("Some-other-resumes-ID", "Another resume", Set.of(), false, false);
 	MongoUser adminUser = new MongoUser(ADMIN_ID, "Admin's name", "Test password", "ADMIN", STANDARD_RESUME_ID);
@@ -265,7 +265,6 @@ class MongoUserDetailsServiceTest {
 			//WHEN
 			MongoUserResponse expected = basicResponseDTO;
 			MongoUserResponse actual = mongoUserDetailsService.register(basicAuthRequestDTO, mockedPrincipal);
-
 			Set<String> expectedUserIds = Stream.concat(standardResume.userIds().stream(), Stream.of(basicUser.id())).collect(Collectors.toSet());
 			Resume expectedSideEffect = new Resume(standardResume.id(), standardResume.name(), expectedUserIds, false, false);
 			Resume actualSideEffect = resumeRepository.findById(STANDARD_RESUME_ID).get();
