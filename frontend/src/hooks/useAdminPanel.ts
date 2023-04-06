@@ -30,8 +30,7 @@ function useAdminPanel() {
 			.then((incomingResumes: Resume[]) => {
 				setResumes(incomingResumes)
 				setAssociatedResumeOptions(incomingResumes.map(
-					(resume: Resume) => SelectOption.fromResume(resume)
-				))
+					(resume: Resume) => SelectOption.fromResume(resume)))
 			})
 	}
 
