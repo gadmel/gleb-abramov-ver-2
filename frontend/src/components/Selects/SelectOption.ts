@@ -6,22 +6,13 @@ export type SelectOptionType = {
 	label: string
 }
 
-let SelectOptionType = {} as SelectOptionType;
-
 class SelectOption {
-
-	type(): SelectOptionType {
-		return SelectOptionType
-	}
-
 	fromUser(user: User) {
 		return {label: user.username, value: user.id}
 	}
-
 	fromResume(resume: Resume) {
 		return {label: resume.name, value: resume.id}
 	}
-
 }
 
 export default new SelectOption
