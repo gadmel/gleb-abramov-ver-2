@@ -6,6 +6,7 @@ import com.glebabramov.backend.model.VerifiedUserResumePair;
 import com.glebabramov.backend.repository.MongoUserRepository;
 import com.glebabramov.backend.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -20,6 +21,17 @@ public class ResumeService {
 	private final AuthorisationService authorisationService;
 	private final VerificationService verificationService;
 	private static final String ADMIN_ROLE = "ADMIN";
+
+
+	@Autowired
+	public ResumeService(ResumeRepository repository, MongoUserRepository userRepository, MongoUserDetailsService mongoUserDetailsService, IdService idService) {
+		this.repository = repository;
+		this.userRepository = userRepository;
+		this.idService = idService;
+		this.authorisationService = new AuthorisationService(mongoUserDetailsService);
+		this.verificationService = new VerificationService(this.userRepository, this.repository);
+	}
+
 
 	public List<Resume> getAllResumes(Principal principal) {
 		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "view all resumes", principal);
