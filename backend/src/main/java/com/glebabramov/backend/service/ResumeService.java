@@ -22,7 +22,6 @@ public class ResumeService {
 	private final VerificationService verificationService;
 	private static final String ADMIN_ROLE = "ADMIN";
 
-
 	@Autowired
 	public ResumeService(ResumeRepository repository, MongoUserRepository userRepository, MongoUserDetailsService mongoUserDetailsService, IdService idService) {
 		this.repository = repository;
@@ -31,7 +30,6 @@ public class ResumeService {
 		this.authorisationService = new AuthorisationService(mongoUserDetailsService);
 		this.verificationService = new VerificationService(this.userRepository, this.repository);
 	}
-
 
 	public List<Resume> getAllResumes(Principal principal) {
 		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "view all resumes", principal);

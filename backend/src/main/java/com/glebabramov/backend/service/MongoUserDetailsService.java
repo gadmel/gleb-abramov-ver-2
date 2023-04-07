@@ -4,7 +4,6 @@ import com.glebabramov.backend.model.*;
 import com.glebabramov.backend.repository.MongoUserRepository;
 
 import com.glebabramov.backend.repository.ResumeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -32,7 +31,6 @@ public class MongoUserDetailsService implements UserDetailsService {
 	private static final String STANDARD_RESUME_ID = "8c687299-9ab7-4f68-8fd9-3de3c521227e";
 	UsernameNotFoundException userNotFoundException = new UsernameNotFoundException("User not found");
 
-	@Autowired
 	public MongoUserDetailsService(MongoUserRepository repository, ResumeRepository resumeRepository, IdService idService, PasswordEncoder passwordEncoder) {
 		this.repository = repository;
 		this.resumeRepository = resumeRepository;
@@ -40,7 +38,6 @@ public class MongoUserDetailsService implements UserDetailsService {
 		this.passwordEncoder = passwordEncoder;
 		this.verificationService = new VerificationService(this.repository, this.resumeRepository);
 	}
-
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
