@@ -8,7 +8,7 @@ export interface Resume {
 	isPublished: boolean;
 }
 
-class resumeService {
+class ResumeService {
 
 	getResume() {
 		return axios
@@ -20,4 +20,4 @@ class resumeService {
 
 }
 
-export default new resumeService();
+export default new ResumeService();
