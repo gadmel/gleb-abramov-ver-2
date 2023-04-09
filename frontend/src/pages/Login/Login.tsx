@@ -1,7 +1,6 @@
 import {ChangeEvent, FormEvent, useState} from "react";
 import {useNavigate} from 'react-router-dom'
-
-import Layout from "../Layout/Layout";
+import Layout from "../../components/Layout/Layout";
 import authenticationService from "../../services/authenticationService";
 
 function Login() {

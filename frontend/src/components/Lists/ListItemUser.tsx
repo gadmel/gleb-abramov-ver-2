@@ -19,7 +19,7 @@ function UserListItem(props: Props) {
 			<div>{props.user.role}</div>
 			<div>{props.associatedResumeOptions.find((option: SelectOptionType) => option.value === props.user.associatedResume)?.label}</div>
 			<div className="action-controls">
-				<button className="action-button action-button--cancel" onClick={() => props.setEditUser(props.user.id)}>
+				<button className="action-button action-button--standard" onClick={() => props.setEditUser(props.user.id)}>
 					<FontAwesomeIcon icon={faEdit}/>
 				</button>
 				<DeleteButtonUser id={props.user.id} role={props.user.role} refreshData={props.refreshData}/>

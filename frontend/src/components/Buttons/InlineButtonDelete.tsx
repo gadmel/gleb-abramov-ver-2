@@ -16,15 +16,15 @@ const DeleteButton = (props: Props) => {
 	return (
 		<>
 			{sureToDelete !== props.id
-				? <button className="action-button action-button--delete" onClick={() => setSureToDelete(props.id)}>
+				? <button className="action-button action-button--danger" onClick={() => setSureToDelete(props.id)}>
 					<FontAwesomeIcon icon={faTrash}/>
 				</button>
 				: <>
-					<button className="action-button action-button--delete"
+					<button className="action-button action-button--danger"
 							  onClick={props.handleConfirmedDelete}>
 						<FontAwesomeIcon icon={faTrash}/>
 					</button>
-					<button className="action-button action-button--cancel" onClick={() => setSureToDelete(null)}>
+					<button className="action-button action-button--standard" onClick={() => setSureToDelete(null)}>
 						<FontAwesomeIcon icon={faTimes}/>
 					</button>
 				</>

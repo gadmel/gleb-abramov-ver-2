@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @Service
@@ -46,6 +47,15 @@ public class VerificationService {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admins cannot be deleted");
 		}
 		return true;
+	}
+
+	public Resume whatResumeUserMayAccess(Principal principal) {
+		Optional<MongoUser> currentUser = mongoUserRepository.findByUsername(principal.getName());
+		if (currentUser.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
+		}
+		String id = currentUser.get().associatedResume();
+		return this.resumeDoesExistById(id);
 	}
 
 	public Resume resumeDoesExistById(String id, boolean secondaryRequest) {

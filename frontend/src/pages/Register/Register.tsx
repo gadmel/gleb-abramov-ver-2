@@ -2,10 +2,10 @@ import React, {ChangeEvent, FormEvent, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBackward} from "@fortawesome/free-solid-svg-icons";
-import Layout from '../Layout/Layout'
+import Layout from '../../components/Layout/Layout'
 import useAuth from "../../hooks/useAuth";
 import adminService from "../../services/adminService";
-import LoadingScreen from "../LoadingScreen/LoadingScreen";
+import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 
 function Register() {
 	const [username, setUsername] = useState('')

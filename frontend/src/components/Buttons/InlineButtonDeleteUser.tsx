@@ -11,7 +11,7 @@ type Props = {
 const DeleteButtonUser = (props: Props) => {
 	const userMayBeDeleted = props.role !== "ADMIN"
 
-	const deleteHandler = () => {
+	const handleDeleteUser = () => {
 		adminService
 			.deleteUser(props.id)
 			.then(() => props.refreshData())
@@ -19,7 +19,7 @@ const DeleteButtonUser = (props: Props) => {
 
 	return (
 		<>
-			{userMayBeDeleted && <DeleteButton id={props.id} role={props.role} handleConfirmedDelete={deleteHandler}/>}
+			{userMayBeDeleted && <DeleteButton id={props.id} role={props.role} handleConfirmedDelete={handleDeleteUser}/>}
 		</>
 	)
 }

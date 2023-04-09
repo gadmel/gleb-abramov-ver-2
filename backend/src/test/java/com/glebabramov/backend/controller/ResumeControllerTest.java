@@ -61,6 +61,53 @@ class ResumeControllerTest {
 	}
 
 	@Nested
+	@DisplayName("GET /api/resume/")
+	class getResume {
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Unauthorised' (401) if the user not logged in")
+		void getResume_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() throws Exception {
+			mockMvc.perform(get("/api/resume/"))
+					.andExpect(status().isUnauthorized());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Corrupted user", roles = "BASIC")
+		@DisplayName("...should throw 'Not found' (404) if the user has an invalid resume ID")
+		void getResume_shouldThrow404NotFound_ifUserHasInvalidResumeId() throws Exception {
+			MongoUser userWithInvalidResumeId = new MongoUser("Some-user-ID", "Corrupted user", encoder.encode(rawPassword), "BASIC", "Invalid-resume-ID");
+			mongoUserRepository.save(userWithInvalidResumeId);
+			mockMvc.perform(get("/api/resume/"))
+					.andExpect(status().isNotFound());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test resume's assigned user", roles = "BASIC")
+		@DisplayName("...should return the resume associated with the user logged in")
+		void getResume_shouldReturnTheResumeAssociatedWithTheLoggedInUser() throws Exception {
+			mongoUserRepository.save(testResumeAssignedUser);
+			resumeRepository.save(testResume);
+			mockMvc.perform(get("/api/resume/"))
+					.andExpect(status().isOk())
+					.andExpect(content().json("""
+							{
+								"id": "Some-resume-ID",
+								"name": "Company name",
+								"userIds": ["Some-user-ID"],
+								"invitationSent": false,
+								"isPublished": false
+							}
+							"""
+					));
+
+		}
+
+	}
+
+	@Nested
 	@DisplayName("GET /api/admin/resumes/")
 	class getAllResumes {
 
@@ -222,6 +269,7 @@ class ResumeControllerTest {
 			assertEquals(expectedSideEffect2, actualSideEffect2);
 
 		}
+
 	}
 
 	@Nested
