@@ -222,86 +222,85 @@ class ResumeControllerTest {
 			assertEquals(expectedSideEffect2, actualSideEffect2);
 
 		}
+	}
+
+	@Nested
+	@DisplayName("DELETE /api/admin/resumes/delete/{id}/")
+	class deleteResume {
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
+		void deleteResume_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() throws Exception {
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
+							.with(csrf()))
+					.andExpect(status().isUnauthorized());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test user", roles = {"BASIC"})
+		@DisplayName("...should throw 'Forbidden' (403) if the user is not an admin")
+		void deleteResume_shouldThrow403Forbidden_ifUserIsNotAdmin() throws Exception {
+			// GIVEN
+			resumeRepository.save(testResume);
+			// WHEN
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
+							.with(csrf()))
+					.andExpect(status().isForbidden());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should throw 'Not Found' (404) if user is an admin but the resume does not exist")
+		void deleteResume_shouldThrow404NotFound_ifResumeDoesNotExist() throws Exception {
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
+							.with(csrf()))
+					.andExpect(status().isNotFound());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin and the resume to delete does exist but one of the users who are assigned to it does not exist and thus cannot be unassigned from it")
+		void deleteResume_shouldThrow422UnprocessableEntity_ifOneOfTheUsersAssignedDoesNotExist() throws Exception {
+			// GIVEN
+			Resume resumeWithNonExistingUser = new Resume("Some-valid-ID", "Company name", Set.of("Some-non-existing-user-id"), false, false);
+			resumeRepository.save(resumeWithNonExistingUser);
+			// WHEN
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + resumeWithNonExistingUser.id() + "/")
+							.with(csrf()))
+					.andExpect(status().isUnprocessableEntity());
+		}
 
 
-		@Nested
-		@DisplayName("DELETE /api/admin/resumes/delete/{id}/")
-		class deleteResume {
-
-			@Test
-			@DirtiesContext
-			@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
-			void deleteResume_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() throws Exception {
-				mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
-								.with(csrf()))
-						.andExpect(status().isUnauthorized());
-			}
-
-			@Test
-			@DirtiesContext
-			@WithMockUser(username = "Test user", roles = {"BASIC"})
-			@DisplayName("...should throw 'Forbidden' (403) if the user is not an admin")
-			void deleteResume_shouldThrow403Forbidden_ifUserIsNotAdmin() throws Exception {
-				// GIVEN
-				resumeRepository.save(testResume);
-				// WHEN
-				mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
-								.with(csrf()))
-						.andExpect(status().isForbidden());
-			}
-
-			@Test
-			@DirtiesContext
-			@WithMockUser(username = "Test admin", roles = {"ADMIN"})
-			@DisplayName("...should throw 'Not Found' (404) if user is an admin but the resume does not exist")
-			void deleteResume_shouldThrow404NotFound_ifResumeDoesNotExist() throws Exception {
-				mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
-								.with(csrf()))
-						.andExpect(status().isNotFound());
-			}
-
-			@Test
-			@DirtiesContext
-			@WithMockUser(username = "Test admin", roles = {"ADMIN"})
-			@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin and the resume to delete does exist but one of the users who are assigned to it does not exist and thus cannot be unassigned from it")
-			void deleteResume_shouldThrow422UnprocessableEntity_ifOneOfTheUsersAssignedDoesNotExist() throws Exception {
-				// GIVEN
-				Resume resumeWithNonExistingUser = new Resume("Some-valid-ID", "Company name", Set.of("Some-non-existing-user-id"), false, false);
-				resumeRepository.save(resumeWithNonExistingUser);
-				// WHEN
-				mockMvc.perform(delete("/api/admin/resumes/delete/" + resumeWithNonExistingUser.id() + "/")
-								.with(csrf()))
-						.andExpect(status().isUnprocessableEntity());
-			}
-
-
-			@Test
-			@DirtiesContext
-			@WithMockUser(username = "Test admin", roles = {"ADMIN"})
-			@DisplayName("...should delete resume, return 'OK' (200) and the deleted resume if the user is an admin and the resume does exist")
-			void deleteResume_shouldDeleteResumeAndReassignResumeToItsUsers_andReturn200OK_ifUserIsAdminAndResumeExists() throws Exception {
-				// GIVEN
-				resumeRepository.save(testResume);
-				mongoUserRepository.save(testResumeAssignedUser);
-				mongoUserRepository.save(adminUser);
-				// WHEN
-				mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
-								.with(csrf()))
-						.andExpect(status().isOk())
-						.andExpect(content().json("""
-								{
-									"id": "Some-resume-ID",
-									"name": "Company name",
-									"userIds": ["Some-user-ID"],
-									"invitationSent": false,
-									"isPublished": false
-								}
-								"""));
-				// THEN
-				Optional<Resume> expected = Optional.empty();
-				Optional<Resume> actual = resumeRepository.findById(testResume.id());
-				assertEquals(expected, actual);
-			}
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should delete resume, return 'OK' (200) and the deleted resume if the user is an admin and the resume does exist")
+		void deleteResume_shouldDeleteResumeAndReassignResumeToItsUsers_andReturn200OK_ifUserIsAdminAndResumeExists() throws Exception {
+			// GIVEN
+			resumeRepository.save(testResume);
+			mongoUserRepository.save(testResumeAssignedUser);
+			mongoUserRepository.save(adminUser);
+			// WHEN
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
+							.with(csrf()))
+					.andExpect(status().isOk())
+					.andExpect(content().json("""
+							{
+								"id": "Some-resume-ID",
+								"name": "Company name",
+								"userIds": ["Some-user-ID"],
+								"invitationSent": false,
+								"isPublished": false
+							}
+							"""));
+			// THEN
+			Optional<Resume> expected = Optional.empty();
+			Optional<Resume> actual = resumeRepository.findById(testResume.id());
+			assertEquals(expected, actual);
 		}
 
 	}
