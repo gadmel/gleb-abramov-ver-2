@@ -4,6 +4,7 @@ import Layout from "../../components/Layout/Layout";
 import useAuth from "../../hooks/useAuth";
 import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import resumeService, {Resume} from "../../services/resumeService";
+import CollapsibleForm from "../../components/Forms/CollapsibleForm";
 
 function ResumePage() {
 	const user = useAuth(true)
@@ -29,6 +30,7 @@ function ResumePage() {
 		resume: Resume | undefined
 		editMode: boolean
 		setEditMode: (editMode: boolean) => void
+		children?: React.ReactNode
 	}
 
 	function EditResumeLayout(layoutProps: LayoutProps) {
@@ -38,22 +40,55 @@ function ResumePage() {
 					<button onClick={() => layoutProps.setEditMode(!layoutProps.editMode)}>Toggle Edit Mode</button>
 				</div>
 				{editMode
-					? <section id="resume">
-						<h1>Resume Page</h1>
-						<p>{layoutProps.resume?.id}</p>
-						<p>{layoutProps.resume?.name}</p>
-						<p>{layoutProps.resume?.invitationSent ? "invitation sent" : "invitation not sent"}</p>
-						<p>{layoutProps.resume?.isPublished ? "published" : "not published"}</p>
-					</section>
-					: <Layout title={"Resume for " + layoutProps.resume?.name + " by Gleb Abramov"}>
-						<section id="resume">
-							<div className="full-screen-unit">
-								<h1>Resume Page</h1>
-								<p>{layoutProps.resume?.name}</p>
-							</div>
-						</section>
-					</Layout>}
+					? <EditResumeForm resume={layoutProps.resume}/>
+					: <DynamicResumeComponent resume={resume}/>}
 			</div>
+		)
+	}
+
+	type EditResumeProps = {
+		resume: Resume | undefined
+	}
+
+	function EditResumeForm(props: EditResumeProps) {
+		const [name, setName] = useState<string>(props.resume?.name || "")
+
+		const handleSubmit = () => {
+			console.log("submitting")
+		}
+
+		return (
+			<Layout title={"Resume for " + props.resume?.name + " by Gleb Abramov"}>
+				<section id="resume">
+					<div className="full-screen-unit">
+						<CollapsibleForm expandedAndFixed formTitle={props.resume?.name || ""} formActionName="Update resume"
+											  handleSubmit={handleSubmit}>
+							<p>Resume title</p>
+							<input type="text" value={name}
+									 onChange={(event) => setName(event.target.value)}/>
+						</CollapsibleForm>
+					</div>
+				</section>
+			</Layout>
+		)
+
+	}
+
+
+	type DynamicResumeComponentProps = {
+		resume: Resume | undefined
+	}
+
+	function DynamicResumeComponent(props: DynamicResumeComponentProps) {
+		return (
+			<Layout title={"Resume for " + props.resume?.name + " by Gleb Abramov"}>
+				<section id="resume">
+					<div className="full-screen-unit">
+						<h1>Resume Page</h1>
+						<p>{props.resume?.name}</p>
+					</div>
+				</section>
+			</Layout>
 		)
 	}
 
@@ -62,15 +97,7 @@ function ResumePage() {
 		? <EditResumeLayout resume={resume} editMode={editMode} setEditMode={setEditMode}/>
 		: !resume
 			? <LoadingScreen/>
-			: <Layout title={"Resume for " + resume.name + " by Gleb Abramov"}>
-				<section id="resume">
-					<div className="full-screen-unit">
-						<h1>Resume Page</h1>
-						<p>{resume.id}</p>
-						<p>{resume.name}</p>
-					</div>
-				</section>
-			</Layout>
+			: <DynamicResumeComponent resume={resume}/>
 }
 
 export default ResumePage;
