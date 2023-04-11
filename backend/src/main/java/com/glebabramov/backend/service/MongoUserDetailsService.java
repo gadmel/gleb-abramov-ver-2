@@ -4,7 +4,6 @@ import com.glebabramov.backend.model.*;
 import com.glebabramov.backend.repository.MongoUserRepository;
 
 import com.glebabramov.backend.repository.ResumeRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -19,19 +18,26 @@ import java.security.Principal;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class MongoUserDetailsService implements UserDetailsService {
 	private final MongoUserRepository repository;
 	private final ResumeRepository resumeRepository;
 	private final IdService idService;
 	private final PasswordEncoder passwordEncoder;
 	private final AuthorisationService authorisationService = new AuthorisationService(this);
-	private final ValidationService validationService;
+	private final ValidationService validationService = new ValidationService();
 	private final VerificationService verificationService;
 	private static final String ADMIN_ROLE = "ADMIN";
 	private static final String USER_ROLE = "BASIC";
 	private static final String STANDARD_RESUME_ID = "8c687299-9ab7-4f68-8fd9-3de3c521227e";
 	UsernameNotFoundException userNotFoundException = new UsernameNotFoundException("User not found");
+
+	public MongoUserDetailsService(MongoUserRepository repository, ResumeRepository resumeRepository, IdService idService, PasswordEncoder passwordEncoder) {
+		this.repository = repository;
+		this.resumeRepository = resumeRepository;
+		this.idService = idService;
+		this.passwordEncoder = passwordEncoder;
+		this.verificationService = new VerificationService(this.repository, this.resumeRepository);
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -49,38 +55,47 @@ public class MongoUserDetailsService implements UserDetailsService {
 	}
 
 	public List<MongoUserResponse> getAllUsers(Principal principal) {
-		authorisationService.isAuthorisedByRole(ADMIN_ROLE, principal, "view all users");
+		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "view all users", principal);
 		return repository.findAll().stream()
 				.map(MongoUser::toResponseDTO)
 				.toList();
 	}
 
 	public MongoUserResponse register(MongoUserAuthRequest user, Principal principal) {
-		authorisationService.isAuthorisedByRole(ADMIN_ROLE, principal, "register users");
+		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "register users", principal);
 		validationService.validateMongoUserAuthRequest(user);
 		verificationService.userDoesNotExistByUsername(user.username());
 
 		MongoUser newUser = new MongoUser(idService.generateId(), user.username(), passwordEncoder.encode(user.password()), USER_ROLE, STANDARD_RESUME_ID);
+		Resume standardResume = verificationService.resumeDoesExistById(STANDARD_RESUME_ID, true);
+
+		resumeRepository.save(standardResume.assignToUser(newUser.id()));
 		MongoUser savedUser = repository.save(newUser);
 		return savedUser.toResponseDTO();
 	}
 
 	public MongoUserResponse update(MongoUserRequest incomingUser, Principal principal) {
-		authorisationService.isAuthorisedByRole(ADMIN_ROLE, principal, "update users");
+		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "update users", principal);
 		validationService.validateMongoUserRequest(incomingUser);
 		MongoUser userToUpdate = verificationService.userDoesExistById(incomingUser.id());
 		Resume associatedResume = verificationService.resumeDoesExistById(incomingUser.associatedResume(), true);
+		Resume previousAssociatedResume = verificationService.resumeDoesExistById(userToUpdate.associatedResume(), true);
 
 		resumeRepository.save(associatedResume.assignToUser(userToUpdate.id()));
+		resumeRepository.save(previousAssociatedResume.unassignFromUser(userToUpdate.id()));
+
 		MongoUser savedUser = repository.save(userToUpdate.updateWithRequestDTO(incomingUser));
 		return savedUser.toResponseDTO();
 	}
 
 	public MongoUserResponse delete(String id, Principal principal) {
-		authorisationService.isAuthorisedByRole(ADMIN_ROLE, principal, "delete users");
+		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "delete users", principal);
 		validationService.validateIdRequest(id);
 		MongoUser userToDelete = verificationService.userDoesExistById(id);
+		verificationService.userMayBeDeleted(userToDelete);
+		Resume associatedResume = verificationService.resumeDoesExistById(userToDelete.associatedResume(), true);
 
+		resumeRepository.save(associatedResume.unassignFromUser(userToDelete.id()));
 		repository.deleteById(id);
 		return userToDelete.toResponseDTO();
 	}

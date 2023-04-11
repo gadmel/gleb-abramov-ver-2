@@ -2,16 +2,16 @@ import React, {useState} from 'react'
 import {useMediaQuery} from "react-responsive";
 import Select from "react-select";
 import CollapsibleForm from "./CollapsibleForm";
-import adminService, {Resume} from "../../services/adminService";
+import adminService from "../../services/adminService";
 import {User} from "../../services/authenticationService";
-import {SelectOption, selectStyles, selectTheme} from "../Selects/SelectStyles";
+import {SelectOptionType} from "../Selects/SelectOption";
+import {selectStyles, selectTheme} from "../Selects/SelectStyles";
 
 type Props = {
 	user: User
-	setUsers: React.Dispatch<React.SetStateAction<User[]>>
 	setEditUser: React.Dispatch<React.SetStateAction<string | null>>
-	associatedResumeOptions: SelectOption[]
-	setResumes: React.Dispatch<React.SetStateAction<Resume[]>>
+	refreshData: () => void
+	associatedResumeOptions: SelectOptionType[]
 }
 
 function CollapsibleFormEditUser(props: Props) {
@@ -24,19 +24,8 @@ function CollapsibleFormEditUser(props: Props) {
 		event.preventDefault()
 		adminService
 			.updateUser(props.user.id, updatedUsername, updatedAssociatedResume)
-			.then((incomingUpdatedUser) => {
-				props.setUsers(prevUsers => prevUsers.map((user: User) =>
-					user.id === incomingUpdatedUser.id
-						? incomingUpdatedUser
-						: user))
-
-			})
-		props.setResumes(prevResumes => prevResumes.map((resume: Resume) =>
-			resume.userId === props.user.id
-				? {...resume, userId: updatedAssociatedResume}
-				: resume))
-		props.setEditUser(null)
-
+			.then(() => props.refreshData())
+			.finally(() => props.setEditUser(null))
 	}
 
 	return (

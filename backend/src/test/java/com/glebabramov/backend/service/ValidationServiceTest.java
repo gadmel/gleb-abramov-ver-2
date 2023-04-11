@@ -3,15 +3,12 @@ package com.glebabramov.backend.service;
 import com.glebabramov.backend.model.MongoUserAuthRequest;
 import com.glebabramov.backend.model.MongoUserRequest;
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 class ValidationServiceTest {
-
 	ValidationService validationService;
 
 	MongoUserAuthRequest mongoUserAuthRequestValid = new MongoUserAuthRequest("username", "password");
@@ -77,8 +74,8 @@ class ValidationServiceTest {
 
 		@Test
 		@DisplayName("... should not throw any exception if username and password are valid")
-		void validateMongoUserAuthRequest_shouldNotThrowAnyException_ifUsernameAndPasswordAreValid() {
-			assertDoesNotThrow(() -> validationService.validateMongoUserAuthRequest(mongoUserAuthRequestValid));
+		void validateMongoUserAuthRequest_shouldReturnTrue_ifUsernameAndPasswordAreValid() {
+			validationService.validateMongoUserAuthRequest(mongoUserAuthRequestValid);
 		}
 
 	}

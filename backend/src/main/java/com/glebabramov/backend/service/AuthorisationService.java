@@ -14,18 +14,20 @@ public class AuthorisationService {
 
 	private final MongoUserDetailsService mongoUserDetailsService;
 
-	public void isAuthorised(Principal principal) {
+	public boolean isAuthorised(Principal principal) {
 		if (principal == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
 		}
+		return true;
 	}
 
-	public void isAuthorisedByRole(String role, Principal principal, String restriction) {
+	public boolean isAuthorisedByRole(String role, String authorisedTo, Principal principal) {
 		isAuthorised(principal);
 		MongoUserResponse currentUser = mongoUserDetailsService.getCurrentUser(principal);
 		if (!currentUser.role().equals(role)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to " + restriction);
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to " + authorisedTo);
 		}
+		return true;
 	}
 
 }

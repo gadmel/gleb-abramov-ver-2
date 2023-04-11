@@ -1,12 +1,11 @@
 import React from 'react'
 import DeleteButton from "./InlineButtonDelete";
-import {User} from "../../services/authenticationService";
 import adminService from "../../services/adminService";
 
 type Props = {
 	id: string
 	role: string
-	setValue: React.Dispatch<React.SetStateAction<User[]>>
+	refreshData: () => void
 }
 
 const DeleteButtonUser = (props: Props) => {
@@ -15,9 +14,7 @@ const DeleteButtonUser = (props: Props) => {
 	const deleteHandler = () => {
 		adminService
 			.deleteUser(props.id)
-			.then((incomingDeletedUser) => {
-				props.setValue((prevUsers: User[]) => prevUsers.filter((user: User) => user.id !== incomingDeletedUser.id))
-			})
+			.then(() => props.refreshData())
 	}
 
 	return (

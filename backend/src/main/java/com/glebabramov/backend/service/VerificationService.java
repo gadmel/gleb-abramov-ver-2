@@ -25,19 +25,34 @@ public class VerificationService {
 		return true;
 	}
 
-	public MongoUser userDoesExistById(String id) {
+	public MongoUser userDoesExistById(String id, boolean secondaryRequest) {
 		Optional<MongoUser> userToUpdate = mongoUserRepository.findById(id);
 		if (userToUpdate.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
+			if (secondaryRequest) {
+				throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Secondary condition not met, because user with id " + id + " does not exist");
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
+			}
 		}
 		return userToUpdate.get();
+	}
+
+	public MongoUser userDoesExistById(String id) {
+		return this.userDoesExistById(id, false);
+	}
+
+	public boolean userMayBeDeleted(MongoUser user) {
+		if (user.role().equals("ADMIN")) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admins cannot be deleted");
+		}
+		return true;
 	}
 
 	public Resume resumeDoesExistById(String id, boolean secondaryRequest) {
 		Optional<Resume> resume = resumeRepository.findById(id);
 		if (resume.isEmpty()) {
 			if (secondaryRequest) {
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Associated resume does not exist");
+				throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Secondary condition not met, because resume with id " + id + " does not exist");
 			} else {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found");
 			}
