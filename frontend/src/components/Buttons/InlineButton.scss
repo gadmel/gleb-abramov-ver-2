@@ -15,12 +15,12 @@
 	cursor: pointer;
 	padding: 0;
 
-	&--delete {
+	&--danger {
 		color: $user-delete;
 		margin-left: auto;
 	}
 
-	&--cancel {
+	&--standard {
 		@media (prefers-color-scheme: light) {
 			color: $user-delete--cancel--light;
 			font-size: larger;

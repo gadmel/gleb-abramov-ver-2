@@ -2,13 +2,13 @@ import React from "react";
 import {useNavigate} from 'react-router-dom'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBackward, faHouse} from "@fortawesome/free-solid-svg-icons";
-import Layout from "../Layout/Layout";
-import LoadingScreen from "../LoadingScreen/LoadingScreen";
+import Layout from "../../components/Layout/Layout";
+import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import authenticationService from "../../services/authenticationService";
 import useAuth from "../../hooks/useAuth";
 import useAdminPanel from "../../hooks/useAdminPanel";
-import ListUsers from "../Lists/ListUsers";
-import ListResumes from "../Lists/ListResumes";
+import ListUsers from "../../components/Lists/ListUsers";
+import ListResumes from "../../components/Lists/ListResumes";
 
 function Admin() {
 	const user = useAuth(true)

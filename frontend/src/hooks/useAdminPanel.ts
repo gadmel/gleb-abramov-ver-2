@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {User} from "../services/authenticationService";
-import adminService, {Resume} from "../services/adminService";
+import adminService from "../services/adminService";
+import {Resume} from "../services/resumeService";
 import SelectOption, {SelectOptionType} from "../components/Selects/SelectOption";
 
 

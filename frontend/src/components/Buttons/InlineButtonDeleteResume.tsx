@@ -9,13 +9,13 @@ type Props = {
 
 const DeleteButtonResume = (props: Props) => {
 
-	const deleteHandler = () => {
+	const handleDeleteResume = () => {
 		adminService
 			.deleteResume(props.id)
 			.then(() => props.refreshData())
 	}
 
-	return <DeleteButton id={props.id} handleConfirmedDelete={deleteHandler}/>
+	return <DeleteButton id={props.id} handleConfirmedDelete={handleDeleteResume}/>
 
 }
 

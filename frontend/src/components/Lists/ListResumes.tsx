@@ -1,4 +1,5 @@
-import {Resume} from "../../services/adminService";
+import React from "react";
+import {Resume} from "../../services/resumeService";
 import DeleteButtonResume from "../Buttons/InlineButtonDeleteResume";
 import {User} from "../../services/authenticationService";
 import CollapsibleFormCreateResume from "../Forms/CollapsibleFormCreateResume";

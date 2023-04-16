@@ -1,6 +1,7 @@
 import React from 'react'
 import {Link, useLocation} from 'react-router-dom'
 import {Helmet} from 'react-helmet'
+import useAuth from "../../hooks/useAuth";
 
 type Props = {
 	title: string
@@ -10,6 +11,10 @@ type Props = {
 function Layout(props: Props) {
 	const {pathname} = useLocation()
 	const isHomePage = pathname === '/'
+	const isCVPage = pathname === '/secured/cv/'
+	const pageHasAFooter = isHomePage || isCVPage
+
+	const user = useAuth()
 
 	return (
 		<>
@@ -30,10 +35,10 @@ function Layout(props: Props) {
 				{props.children}
 			</main>
 
-			{isHomePage && (
+			{pageHasAFooter && (
 				<footer>
 					<p>2023 by Gleb Abramov. Version 1.0</p>
-					<p><Link to="/legal/">Legal Notice</Link> - <Link to="/secured/">Secured</Link></p>
+					<p><Link to="/legal/">Legal Notice</Link> - <Link to={user?.role === "ADMIN" ? "/secured/" : "/secured/cv/"}>Secured</Link></p>
 				</footer>
 			)}
 		</>

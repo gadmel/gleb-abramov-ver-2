@@ -68,4 +68,7 @@ public class ResumeService {
 		return resumeToDelete;
 	}
 
+	public Resume getAssociatedResume(Principal principal) {
+		return verificationService.whatResumeUserMayAccess(principal);
+	}
 }

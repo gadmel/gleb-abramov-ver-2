@@ -12,22 +12,27 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/admin/resumes")
+@RequestMapping("/api")
 public class ResumeController {
 	private final ResumeService resumeService;
 
-	@GetMapping("/")
+	@GetMapping("/resume/")
+	public Resume getResume(Principal principal) {
+		return resumeService.getAssociatedResume(principal);
+	}
+
+	@GetMapping("/admin/resumes/")
 	public List<Resume> getResumes(Principal principal) {
 		return resumeService.getAllResumes(principal);
 	}
 
-	@PostMapping("/create/")
+	@PostMapping("/admin/resumes/create/")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public Resume createResume(@RequestBody ResumeCreateRequest resume, Principal principal) {
 		return resumeService.createResume(resume, principal);
 	}
 
-	@DeleteMapping("/delete/{id}/")
+	@DeleteMapping("/admin/resumes/delete/{id}/")
 	public Resume deleteResume(@PathVariable("id") String id, Principal principal) {
 		return resumeService.deleteResume(id, principal);
 	}

@@ -3,11 +3,12 @@ import {Route, Routes, Navigate} from 'react-router-dom'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-import LandingPage from "../LandingPage/LandingPage";
-import LegalNotice from "../LegalNotice/LegalNotice";
-import Login from "../Login/Login";
-import Register from "../Register/Register";
-import Admin from "../Admin/Admin";
+import LandingPage from "../../pages/LandingPage/LandingPage";
+import LegalNotice from "../../pages/LegalNotice/LegalNotice";
+import Login from "../../pages/Login/Login";
+import Register from "../../pages/Register/Register";
+import Admin from "../../pages/Admin/Admin";
+import ResumePage from "../../pages/Resume/Resume";
 
 axios.interceptors.request.use(
 	function (config) {
@@ -33,6 +34,7 @@ function App() {
 
 				<Route path={"/secured/"} element={<Admin/>}/>
 				<Route path={"/secured/register/"} element={<Register/>}/>
+				<Route path={"/secured/cv/"} element={<ResumePage/>}/>
 
 				<Route path="/*" element={<Navigate to="/"/>}/>
 

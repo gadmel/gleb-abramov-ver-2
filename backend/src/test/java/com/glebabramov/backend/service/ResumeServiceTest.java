@@ -28,9 +28,9 @@ class ResumeServiceTest {
 	Principal mockedPrincipal = mock(Principal.class);
 	ResumeService resumeService;
 
-	String STANDARD_RESUME_ID = "8c687299-9ab7-4f68-8fd9-3de3c521227e";
 	String ADMIN_USER_ID = "Some-other-ID";
 	String BASIC_USER_ID = "Some-ID";
+	String STANDARD_RESUME_ID = "8c687299-9ab7-4f68-8fd9-3de3c521227e";
 	String BASIC_USERS_ASSOCIATED_RESUME_ID = "Users-specific-resume-ID";
 	MongoUser adminUser = new MongoUser(ADMIN_USER_ID, "Admin's name", "Test password", "ADMIN", STANDARD_RESUME_ID);
 	MongoUserResponse adminUserResponse = adminUser.toResponseDTO();
@@ -282,6 +282,58 @@ class ResumeServiceTest {
 			assertTrue(resumeRepository.findById(TEST_RESUMES_ID).isEmpty());
 			assertEquals(expectedSideEffect, actualSideEffect);
 		}
+
+	}
+
+	@Nested
+	@DisplayName("getAssociatedResume()")
+	class getAssociatedResume {
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
+		void getAssociatedResume_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() {
+			//WHEN
+			ResponseStatusException expected = unauthorisedUserException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.getAssociatedResume(mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should return 'Not Found' (404) if the user is logged in but has a corrupted association to a resume")
+		void getAssociatedResume_shouldThrow404NotFound_ifUsersAssociatedResumeIsInvalid() {
+			//GIVEN
+			MongoUser userWithInvalidAssociatedResume = new MongoUser("Different-id", "Different-name", basicUser.password(), basicUser.role(), "invalid-resume-id");
+			mongoUserRepository.save(userWithInvalidAssociatedResume);
+			when(mockedPrincipal.getName()).thenReturn(userWithInvalidAssociatedResume.username());
+			//WHEN
+			ResponseStatusException expected = resumeNotFoundException;
+			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.getAssociatedResume(mockedPrincipal));
+			//THEN
+			assertEquals(expected.getClass(), actual.getClass());
+			assertEquals(expected.getMessage(), actual.getMessage());
+		}
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should return resume if the user is logged in and has a valid association to a resume")
+		void getAssociatedResume_shouldReturnResume_ifUserIsLoggedInAndHasValidAssociation() {
+			//GIVEN
+			mongoUserRepository.save(basicUser);
+			when(mockedPrincipal.getName()).thenReturn(basicUser.username());
+			Resume oldResume = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", Set.of(BASIC_USER_ID), false, false);
+			resumeRepository.save(oldResume);
+			//WHEN
+			Resume expected = oldResume;
+			Resume actual = resumeService.getAssociatedResume(mockedPrincipal);
+			//THEN
+			assertEquals(expected, actual);
+		}
+
+
 
 	}
 

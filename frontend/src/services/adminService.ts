@@ -1,13 +1,6 @@
 import axios from 'axios';
 import {User} from './authenticationService';
-
-export interface Resume {
-	id: string;
-	name: string;
-	userIds: string[];
-	invitationSent: boolean;
-	isPublished: boolean;
-}
+import {Resume} from "./resumeService";
 
 class AdminService {
 	getAllUsers() {
