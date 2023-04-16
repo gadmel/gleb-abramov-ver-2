@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -49,6 +50,7 @@ class ResumeControllerTest {
 	String testResumesAssignedUserId = "Some-user-ID";
 	Resume testResume = new Resume(testResumeId, "Company name", Set.of(testResumesAssignedUserId), false, false);
 	MongoUser testResumeAssignedUser = new MongoUser(testResumesAssignedUserId, "Test resume's assigned user", encoder.encode(rawPassword), "BASIC", testResumeId);
+	Resume standardResume = new Resume("8c687299-9ab7-4f68-8fd9-3de3c521227e", "Standard company name", Set.of(), false, false);
 
 	@BeforeEach
 	void setUp() {
@@ -273,6 +275,185 @@ class ResumeControllerTest {
 	}
 
 	@Nested
+	@DisplayName("PUT /api/admin/resumes/update/")
+	class updateResume {
+
+		@Test
+		@DirtiesContext
+		@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
+		void updateResume_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() throws Exception {
+			mockMvc.perform(put("/api/admin/resumes/update/")
+							.with(csrf())
+							.contentType(MediaType.APPLICATION_JSON)
+							.content("""
+									{
+										"id": "Some-resume-ID",
+										"name": "Resume name",
+										"userIds": ["Some-user-id"]
+									}
+									"""))
+					.andExpect(status().isUnauthorized());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test user", roles = {"BASIC"})
+		@DisplayName("...should throw 'Forbidden' (403) if the user is not an admin")
+		void updateResume_shouldThrow403Forbidden_ifUserIsNotAdmin() throws Exception {
+			mockMvc.perform(put("/api/admin/resumes/update/")
+							.with(csrf())
+							.contentType(MediaType.APPLICATION_JSON)
+							.content("""
+									{
+										"id": "Some-resume-ID",
+										"name": "Resume name",
+										"userIds": ["Some-user-id"]
+									}
+									"""))
+					.andExpect(status().isForbidden());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should throw 'Not Found' (404) if the user is an admin but the resume to update does not exist")
+		void updateResume_shouldThrow404NotFound_ifResumeToUpdateDoesNotExist() throws Exception {
+			mockMvc.perform(put("/api/admin/resumes/update/")
+							.with(csrf())
+							.contentType(MediaType.APPLICATION_JSON)
+							.content("""
+									{
+										"id": "Some-resume-ID",
+										"name": "Resume name",
+										"userIds": ["Some-user-id"]
+									}
+									"""))
+					.andExpect(status().isNotFound());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin but the resume to update has an invalid associated user's id")
+		void updateResume_shouldThrow422UnprocessableEntity_ifAssociatedUserDoesNotExist() throws Exception {
+			// GIVEN
+			resumeRepository.save(testResume);
+			// WHEN
+			mockMvc.perform(put("/api/admin/resumes/update/")
+							.with(csrf())
+							.contentType(MediaType.APPLICATION_JSON)
+							.content("""
+									{
+										"id": "Some-resume-ID",
+										"name": "Resume name",
+										"userIds": ["Some-invalid-user-ID"]
+									}
+									"""))
+					.andExpect(status().isUnprocessableEntity());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin but the resume's to update associated user's previously assigned resume does not exist and thus cannot be unassigned from it")
+		void updateResume_shouldThrow422UnprocessableEntity_ifAssociatedUserPreviouslyAssignedResumeDoesNotExist() throws Exception {
+			// GIVEN
+			MongoUser corruptedUser = new MongoUser("Another-user-ID", testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), "Some-invalid-resume-ID");
+			mongoUserRepository.save(corruptedUser);
+			resumeRepository.save(testResume);
+			mongoUserRepository.save(testResumeAssignedUser);
+			// WHEN
+			mockMvc.perform(put("/api/admin/resumes/update/")
+							.with(csrf())
+							.contentType(MediaType.APPLICATION_JSON)
+							.content("""
+									{
+										"id": "Some-resume-ID",
+										"name": "Resume name",
+										"userIds": ["Some-user-ID", "Another-user-ID"]
+									}
+									"""))
+					.andExpect(status().isUnprocessableEntity());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin and the resume's to update associated user's previously assigned resume does exist but the standard resume does not and thus the user cannot be re-assigned to it")
+		void updateResume_shouldThrow422UnprocessableEntity_ifAssociatedUserPreviouslyAssignedResumeExistsButReplacingResumeDoesNotExist() throws Exception {
+			// GIVEN
+			MongoUser anotherTestUser = new MongoUser("Another-user-ID", testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), "Some-valid-resume-ID");
+			mongoUserRepository.save(anotherTestUser);
+			Resume testResume2 = new Resume("Some-valid-resume-ID", testResume.name(), Set.of("Another-user-ID"), testResume.invitationSent(), testResume.isPublished());
+			resumeRepository.save(testResume);
+			resumeRepository.save(testResume2);
+			mongoUserRepository.save(testResumeAssignedUser);
+			// WHEN
+			mockMvc.perform(put("/api/admin/resumes/update/")
+							.with(csrf())
+							.contentType(MediaType.APPLICATION_JSON)
+							.content("""
+									{
+										"id": "Some-resume-ID",
+										"name": "Resume name",
+										"userIds": ["Another-user-ID"]
+									}
+									"""))
+					.andExpect(status().isUnprocessableEntity());
+		}
+
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should update the resume, and handle the associated users' (former and newly set) resume assignments, return 200 (OK) and the updated resume if the user is an admin, resume to update exists, associated users exist and their assigned resumes as well as the replacing resume exist")
+		void updateResume_shouldreturn200OKAndTheUpdatedResume_andUpdateResumeAndItsAssociatedUsers__ifResumeToUpdateAndAllAssociatedUsersAndResumesDoExist() throws Exception {
+			// GIVEN
+			MongoUser anotherTestUser = new MongoUser("Another-user-ID", testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), "Some-valid-resume-ID");
+			mongoUserRepository.save(anotherTestUser);
+			mongoUserRepository.save(testResumeAssignedUser);
+			Resume testResume2 = new Resume("Some-valid-resume-ID", testResume.name(), Set.of("Another-user-ID"), testResume.invitationSent(), testResume.isPublished());
+			resumeRepository.save(testResume2);
+			resumeRepository.save(testResume);
+			resumeRepository.save(standardResume);
+			// WHEN
+			mockMvc.perform(put("/api/admin/resumes/update/")
+							.with(csrf())
+							.contentType(MediaType.APPLICATION_JSON)
+							.content("""
+									{
+										"id": "Some-resume-ID",
+										"name": "Resume name",
+										"userIds": ["Another-user-ID"]
+									}
+									"""))
+					.andExpect(status().isOk())
+					.andExpect(content().json("""
+							{
+								"id": "Some-resume-ID",
+								"name": "Resume name",
+								"userIds": ["Another-user-ID"],
+								"invitationSent": false,
+								"isPublished": false
+							}
+							"""));
+			// THEN
+			MongoUser expectedSideEffect1 = new MongoUser(testResumesAssignedUserId, testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), standardResume.id());
+			MongoUser actualSideEffect1 = mongoUserRepository.findById(testResumesAssignedUserId).get();
+			Resume expectedSideEffect2 = new Resume(standardResume.id(), standardResume.name(), Set.of(testResumesAssignedUserId), standardResume.invitationSent(), standardResume.isPublished());
+			Resume actualSideEffect2 = resumeRepository.findById(standardResume.id()).get();
+			MongoUser expectedSideEffect3 = new MongoUser(anotherTestUser.id(), anotherTestUser.username(), anotherTestUser.password(), anotherTestUser.role(), testResumeId);
+			MongoUser actualSideEffect3 = mongoUserRepository.findById(anotherTestUser.id()).get();
+			Resume expectedSideEffect4 = new Resume(testResume2.id(), testResume2.name(), Set.of(), testResume2.invitationSent(), testResume2.isPublished());
+			Resume actualSideEffect4 = resumeRepository.findById(testResume2.id()).get();
+			assertEquals(expectedSideEffect1, actualSideEffect1);
+			assertEquals(expectedSideEffect2, actualSideEffect2);
+			assertEquals(expectedSideEffect3, actualSideEffect3);
+			assertEquals(expectedSideEffect4, actualSideEffect4);
+		}
+
+	}
+
+	@Nested
 	@DisplayName("DELETE /api/admin/resumes/delete/{id}/")
 	class deleteResume {
 
@@ -280,7 +461,7 @@ class ResumeControllerTest {
 		@DirtiesContext
 		@DisplayName("...should throw 'Unauthorised' (401) if the user is not logged in")
 		void deleteResume_shouldThrow401Unauthorised_ifUserIsNotLoggedIn() throws Exception {
-			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResumeId + "/")
 							.with(csrf()))
 					.andExpect(status().isUnauthorized());
 		}
@@ -293,7 +474,7 @@ class ResumeControllerTest {
 			// GIVEN
 			resumeRepository.save(testResume);
 			// WHEN
-			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResumeId + "/")
 							.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
@@ -303,7 +484,7 @@ class ResumeControllerTest {
 		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
 		@DisplayName("...should throw 'Not Found' (404) if user is an admin but the resume does not exist")
 		void deleteResume_shouldThrow404NotFound_ifResumeDoesNotExist() throws Exception {
-			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResumeId + "/")
 							.with(csrf()))
 					.andExpect(status().isNotFound());
 		}
@@ -322,18 +503,31 @@ class ResumeControllerTest {
 					.andExpect(status().isUnprocessableEntity());
 		}
 
+		@Test
+		@DirtiesContext
+		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
+		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin and the resume to delete does exist but the standard resume does not exist and thus cannot be assigned to the users who were un-assigned from the deleted resume")
+		void deleteResume_shouldThrow422UnprocessableEntity_ifReplacingResumeDoesNotExist() throws Exception {
+			// GIVEN
+			resumeRepository.save(testResume);
+			mongoUserRepository.save(testResumeAssignedUser);
+			// WHEN
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResumeId + "/")
+							.with(csrf()))
+					.andExpect(status().isUnprocessableEntity());
+		}
 
 		@Test
 		@DirtiesContext
 		@WithMockUser(username = "Test admin", roles = {"ADMIN"})
-		@DisplayName("...should delete resume, return 'OK' (200) and the deleted resume if the user is an admin and the resume does exist")
+		@DisplayName("...should delete resume, re-assign it's associated users to a standard resume, return 'OK' (200) and the deleted resume if the user is an admin and the resume does exist")
 		void deleteResume_shouldDeleteResumeAndReassignResumeToItsUsers_andReturn200OK_ifUserIsAdminAndResumeExists() throws Exception {
 			// GIVEN
 			resumeRepository.save(testResume);
 			mongoUserRepository.save(testResumeAssignedUser);
-			mongoUserRepository.save(adminUser);
+			resumeRepository.save(standardResume);
 			// WHEN
-			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResume.id() + "/")
+			mockMvc.perform(delete("/api/admin/resumes/delete/" + testResumeId + "/")
 							.with(csrf()))
 					.andExpect(status().isOk())
 					.andExpect(content().json("""
@@ -347,8 +541,14 @@ class ResumeControllerTest {
 							"""));
 			// THEN
 			Optional<Resume> expected = Optional.empty();
-			Optional<Resume> actual = resumeRepository.findById(testResume.id());
+			Optional<Resume> actual = resumeRepository.findById(testResumeId);
+			MongoUser expectedSideEffect1 = new MongoUser(testResumesAssignedUserId, testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), standardResume.id());
+			MongoUser actualSideEffect1 = mongoUserRepository.findById(testResumesAssignedUserId).get();
+			Resume expectedSideEffect2 = new Resume(standardResume.id(), standardResume.name(), Set.of(testResumesAssignedUserId), standardResume.invitationSent(), standardResume.isPublished());
+			Resume actualSideEffect2 = resumeRepository.findById(standardResume.id()).get();
 			assertEquals(expected, actual);
+			assertEquals(expectedSideEffect1, actualSideEffect1);
+			assertEquals(expectedSideEffect2, actualSideEffect2);
 		}
 
 	}

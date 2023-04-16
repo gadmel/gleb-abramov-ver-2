@@ -1,8 +1,6 @@
 package com.glebabramov.backend.service;
 
-import com.glebabramov.backend.model.Resume;
-import com.glebabramov.backend.model.ResumeCreateRequest;
-import com.glebabramov.backend.model.VerifiedUserResumePair;
+import com.glebabramov.backend.model.*;
 import com.glebabramov.backend.repository.MongoUserRepository;
 import com.glebabramov.backend.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class ResumeService {
 	private final AuthorisationService authorisationService;
 	private final VerificationService verificationService;
 	private static final String ADMIN_ROLE = "ADMIN";
+	private static final String STANDARD_RESUME_ID = "8c687299-9ab7-4f68-8fd9-3de3c521227e";
 
 	@Autowired
 	public ResumeService(ResumeRepository repository, MongoUserRepository userRepository, MongoUserDetailsService mongoUserDetailsService, IdService idService) {
@@ -56,13 +57,57 @@ public class ResumeService {
 		return repository.save(newResume);
 	}
 
+	public Resume updateResume(ResumeRequest incomingResume, Principal principal) {
+		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "update resumes", principal);
+		Resume resumeToUpdate = verificationService.resumeDoesExistById(incomingResume.id());
+
+		Set<VerifiedUserResumePair> usersToUnassignResumeFrom = resumeToUpdate.userIds().stream()
+				.filter(userId -> !incomingResume.userIds().contains(userId))
+				.map(userId -> {
+					MongoUser verifiedUserToUnassignResumeFrom = verificationService.userDoesExistById(userId, true);
+					Resume previouslyAssignedResume = verificationService.resumeDoesExistById(verifiedUserToUnassignResumeFrom.associatedResume(), true);
+					return new VerifiedUserResumePair(verifiedUserToUnassignResumeFrom, previouslyAssignedResume);
+				})
+				.collect(Collectors.toSet());
+
+		Set<VerifiedUserResumePair> usersToReassignResumeTo = incomingResume.userIds().stream()
+				.filter(userId -> !resumeToUpdate.userIds().contains(userId))
+				.map(userId -> {
+					MongoUser verifiedUserToReassignResumeTo = verificationService.userDoesExistById(userId, true);
+					Resume previouslyAssignedResume = verificationService.resumeDoesExistById(verifiedUserToReassignResumeTo.associatedResume(), true);
+					return new VerifiedUserResumePair(verifiedUserToReassignResumeTo, previouslyAssignedResume);
+				})
+				.collect(Collectors.toSet());
+
+		Resume newResume = new Resume(incomingResume.id(), incomingResume.name(), incomingResume.userIds(), resumeToUpdate.invitationSent(), resumeToUpdate.isPublished());
+
+		usersToUnassignResumeFrom.forEach(verifiedPair -> {
+			repository.save(verifiedPair.resume().unassignFromUser(verifiedPair.user().id()));
+			userRepository.save(verifiedPair.user().unassignResume());
+			Resume standardResume = verificationService.resumeDoesExistById(STANDARD_RESUME_ID, true);
+			repository.save(standardResume.assignToUser(verifiedPair.user().id()));
+		});
+		usersToReassignResumeTo.forEach(verifiedPair -> {
+			Resume previouslyAssignedResumeRefreshed = verificationService.resumeDoesExistById(verifiedPair.resume().id(), true);
+			repository.save(previouslyAssignedResumeRefreshed.unassignFromUser(verifiedPair.user().id()));
+			userRepository.save(verifiedPair.user().reassignResume(newResume.id()));
+		});
+
+		return repository.save(newResume);
+	}
+
 	public Resume deleteResume(String id, Principal principal) {
 		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "delete resumes", principal);
 		Resume resumeToDelete = verificationService.resumeDoesExistById(id);
 
 		resumeToDelete.userIds().stream()
 				.map(usersToUnassignResumeFromId -> verificationService.userDoesExistById(usersToUnassignResumeFromId, true))
-				.forEach(userToUnassignResumeFrom -> userRepository.save(userToUnassignResumeFrom.unassignResume()));
+				.forEach(userToUnassignResumeFrom -> {
+					MongoUser updatedUser = userToUnassignResumeFrom.unassignResume();
+					userRepository.save(updatedUser);
+					Resume resumeToAssignUserTo = verificationService.resumeDoesExistById(updatedUser.associatedResume(), true);
+					repository.save(resumeToAssignUserTo.assignToUser(updatedUser.id()));
+				});
 
 		repository.deleteById(id);
 		return resumeToDelete;

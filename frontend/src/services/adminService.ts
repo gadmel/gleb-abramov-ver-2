@@ -55,6 +55,14 @@ class AdminService {
 			});
 	}
 
+	updateResume(id: string, name: string, userIds: string[]) {
+		return axios
+			.put(`/api/admin/resumes/update/`, {id, name, userIds})
+			.then((response: { data: Resume }) => {
+				return response.data;
+			});
+	}
+
 	deleteResume(id: string) {
 		return axios
 			.delete(`/api/admin/resumes/delete/${id}/`)
