@@ -37,6 +37,7 @@ public class SecurityConfig {
 				.authorizeHttpRequests()
 				.requestMatchers(HttpMethod.GET, "/api/csrf/").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/login/").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/users/current/").permitAll()
 				.requestMatchers("/api/**").authenticated()
 				.requestMatchers("/api/admin/**").hasRole(ADMIN_ROLE)
 				.anyRequest().permitAll()
