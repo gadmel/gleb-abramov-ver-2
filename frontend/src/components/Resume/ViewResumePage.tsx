@@ -91,31 +91,31 @@ function ViewResumePage(props: Props) {
 							General concepts:
 							<div className="skills-list">
 								{staticDataKnowHowGeneral.map((skill: string) => {
-									return <div className="skill-tag">{skill}</div>
+									return <div className="skill-tag" key={skill}>{skill}</div>
 								})}
 							</div>
 							Backend:
 							<div className="skills-list">
 								{staticDataKnowHowBackend.map((skill: string) => {
-									return <div className="skill-tag">{skill}</div>
+									return <div className="skill-tag" key={skill}>{skill}</div>
 								})}
 							</div>
 							Frontend:
 							<div className="skills-list">
 								{staticDataKnowHowFrontend.map((skill: string) => {
-									return <div className="skill-tag">{skill}</div>
+									return <div className="skill-tag" key={skill}>{skill}</div>
 								})}
 							</div>
 							Common tools:
 							<div className="skills-list">
 								{staticDataKnowHowCommonTools.map((skill: string) => {
-									return <div className="skill-tag">{skill}</div>
+									return <div className="skill-tag" key={skill}>{skill}</div>
 								})}
 							</div>
 							Shallow knowledge and field of interest:
 							<div className="skills-list">
 								{staticDataKnowHowShallowKnowledge.map((skill: string) => {
-									return <div className="skill-tag">{skill}</div>
+									return <div className="skill-tag" key={skill}>{skill}</div>
 								})}
 							</div>
 						</div>
@@ -127,7 +127,7 @@ function ViewResumePage(props: Props) {
 						<Timeline className="cv">
 							{staticDataExperience?.map((employment: EmploymentPosition) => {
 								return (
-									<Timeline.Item dot={<Logo {...employment.logo}/>}>
+									<Timeline.Item dot={<Logo {...employment.logo}/>} key={employment.company}>
 										<Position {...employment}/>
 									</Timeline.Item>
 								)
