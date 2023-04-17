@@ -24,7 +24,7 @@ const Position = (props: EmploymentPosition) => {
 			<p className="cv-position--description">{props.description}</p>
 			<div className="skills-list">
 				{props.skills?.map((skill: string) => {
-					return <div className="skill-tag">{skill}</div>
+					return <div className="skill-tag" key={skill}>{skill}</div>
 				})}
 			</div>
 		</div>
