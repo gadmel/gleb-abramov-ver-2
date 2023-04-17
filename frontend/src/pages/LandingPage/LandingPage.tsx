@@ -40,7 +40,7 @@ function LandingPage() {
 						drum.</p>
 					<p className="conclusion">And I am very passionate about it.</p>
 
-					<p className="extension">My beloved spouse posses a very beautiful-sounding piano, which she
+					<p className="extension">My beloved spouse possesses a very beautiful-sounding piano, which she
 						gratefully allows me to play. So I produce these sounds also, they can hardly be called music
 						though;</p>
 					<p className="conclusion">She does it obviously because she loves me.</p>

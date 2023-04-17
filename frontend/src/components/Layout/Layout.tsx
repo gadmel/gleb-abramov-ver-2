@@ -37,7 +37,7 @@ function Layout(props: Props) {
 
 			{pageHasAFooter && (
 				<footer>
-					<p>2023 by Gleb Abramov. Version 1.0</p>
+					<p>2023 by Gleb Abramov</p>
 					<p><Link to="/legal/">Legal Notice</Link> - <Link to={user?.role === "ADMIN" ? "/secured/" : "/secured/cv/"}>Secured</Link></p>
 				</footer>
 			)}
