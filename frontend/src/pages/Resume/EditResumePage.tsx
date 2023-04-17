@@ -17,6 +17,7 @@ function EditResumePage(props: Props) {
 	const {resume, editMode, isStandardResume, toggleEditMode, usersSelectOptions} = useEditResume(props)
 
 	const [name, setName] = useState<string>(props.resume.name || "")
+	const [addressing, setAddressing] = useState<string>(props.resume.addressing || "")
 	const [userIds, setUserIds] = useState<string[]>(props.resume.userIds || [])
 
 	const [preview, setPreview] = useState<Resume>({} as Resume)
@@ -36,6 +37,7 @@ function EditResumePage(props: Props) {
 			{editMode
 				? <CollapsibleFormEditResume resume={resume} isStandardResume={isStandardResume}
 													  name={name} setName={setName}
+													  addressing={addressing} setAddressing={setAddressing}
 													  userIds={userIds} setUserIds={setUserIds}
 													  usersSelectOptions={usersSelectOptions}/>
 				: <ViewResumePage resume={preview}/>}

@@ -15,12 +15,13 @@ function CollapsibleFormCreateResume(props: Props) {
 	const systemPrefersLight = useMediaQuery({query: '(prefers-color-scheme: light)'})
 
 	const [newResumeName, setNewResumeName] = useState<string>('')
+	const [newAddressing, setNewAddressing] = useState<string>('')
 	const [newResumeUserIds, setNewResumeUserIds] = useState<string[]>([])
 
 	const handleCreateResume = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		adminService
-			.createResume(newResumeName, newResumeUserIds)
+			.createResume(newResumeName, newAddressing, newResumeUserIds)
 			.then(() => props.refreshData())
 			.finally(() => {
 				setNewResumeName('')
@@ -31,9 +32,16 @@ function CollapsibleFormCreateResume(props: Props) {
 	return (
 		<CollapsibleForm formTitle="Create resume" formActionName="Create" handleSubmit={handleCreateResume}>
 			<input className="form__input"
-					 placeholder="New resume"
+					 placeholder="New resume name"
 					 value={newResumeName}
 					 onChange={event => setNewResumeName(event.target.value)}
+			/>
+			<textarea
+				rows={8}
+				className="form__input"
+				placeholder="Addressing"
+				value={newAddressing}
+				onChange={event => setNewAddressing(event.target.value)}
 			/>
 			<Select isMulti
 					  options={props.usersSelectOptions}

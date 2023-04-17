@@ -13,6 +13,8 @@ type Props = {
 	resume: Resume
 	name: string
 	setName: (name: string) => void
+	addressing: string
+	setAddressing: (addressing: string) => void
 	userIds: string[]
 	setUserIds: (userIds: string[]) => void
 	usersSelectOptions: SelectOptionType[]
@@ -26,7 +28,7 @@ function CollapsibleFormEditResume(props: Props) {
 	const handleUpdateResume = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		adminService
-			.updateResume(props.resume.id, props.name, props.userIds)
+			.updateResume(props.resume.id, props.name, props.addressing, props.userIds)
 			.then((resume: Resume) => {
 				navigate("/secured/cv/", {state: {resume}})
 			})
@@ -44,11 +46,18 @@ function CollapsibleFormEditResume(props: Props) {
 										  formActionName="Update resume"
 										  handleSubmit={handleUpdateResume}
 										  handleCancel={handleNavigateToAdminPanel}>
+
 						<p>Resume title</p>
 						<input type="text"
 								 className="form__input"
 								 value={props.name}
 								 onChange={(event) => props.setName(event.target.value)}/>
+
+						<p>Addressing</p>
+						<textarea rows={8}
+									 className="form__input"
+									 value={props.addressing}
+									 onChange={(event) => props.setAddressing(event.target.value)}/>
 
 						{!props.isStandardResume && <>
                       <p>Assigned users</p>
