@@ -33,7 +33,7 @@ class VerificationServiceTest {
 	MongoUser adminUser = new MongoUser(ADMIN_ID, "Admin user's name", "Test password", "ADMIN", "8c687299-9ab7-4f68-8fd9-3de3c521227e");
 	String basicUserName = basicUser.username();
 
-	Resume testResume = new Resume("8c687299-9ab7-4f68-8fd9-3de3c521227e", "Company name", Set.of("Some-ID"), false, false);
+	Resume testResume = new Resume("8c687299-9ab7-4f68-8fd9-3de3c521227e", "Company name", "Hello, company!",Set.of("Some-ID"), false, false);
 
 	ResponseStatusException userNotLoggedInException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
 	ResponseStatusException userAlreadyExistsException = new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
@@ -59,7 +59,7 @@ class VerificationServiceTest {
 		when(resumeRepository.save(any(Resume.class))).thenAnswer(invocation -> {
 			Resume savedResume = invocation.getArgument(0);
 			when(resumeRepository.findById(savedResume.id())).thenReturn(Optional.of(savedResume));
-			return new Resume(savedResume.id(), savedResume.name(), savedResume.userIds(), savedResume.invitationSent(), savedResume.isPublished());
+			return new Resume(savedResume.id(), savedResume.name(), savedResume.addressing(), savedResume.userIds(), savedResume.invitationSent(), savedResume.isPublished());
 		});
 		resumeRepository.save(testResume);
 		when(mockedPrincipalAuthorisedUser.getName()).thenReturn(basicUserName);

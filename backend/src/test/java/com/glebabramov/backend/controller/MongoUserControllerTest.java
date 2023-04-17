@@ -53,13 +53,13 @@ class MongoUserControllerTest {
 	Resume basicUserResume;
 
 	String STANDARD_RESUME_ID = "8c687299-9ab7-4f68-8fd9-3de3c521227e";
-	Resume standardResume = new Resume(STANDARD_RESUME_ID, "Standard resume", Set.of("Some-ID", "Some-other-ID"), false, false);
+	Resume standardResume = new Resume(STANDARD_RESUME_ID, "Standard resume", "Hello, company!", Set.of("Some-ID", "Some-other-ID"), false, false);
 
 	@BeforeEach
 	void setUp() {
 		adminUser = new MongoUser("Some-ID", "Test admin", encoder.encode(rawPassword), "ADMIN", "Irrelevant-for-these-tests");
 		basicUser = new MongoUser("Another-ID", "Test user", encoder.encode(rawPassword), "BASIC", STANDARD_RESUME_ID);
-		basicUserResume = new Resume("Some-ID", "Test resume", Set.of(basicUser.id()), false, false);
+		basicUserResume = new Resume("Some-ID", "Test resume", "Hello, company!", Set.of(basicUser.id()), false, false);
 		when(mockedPrincipal.getName()).thenReturn(adminUser.username());
 	}
 
@@ -284,7 +284,7 @@ class MongoUserControllerTest {
 			// AND
 			Set<String> expectedUserIds = new HashSet<>(standardResume.userIds());
 			expectedUserIds.add(registeredUser.id());
-			Resume expectedSideEffect = new Resume(standardResume.id(), standardResume.name(), expectedUserIds, false, false);
+			Resume expectedSideEffect = new Resume(standardResume.id(), standardResume.name(), standardResume.addressing(), expectedUserIds, false, false);
 			Resume actualSideEffect = resumeRepository.findById(STANDARD_RESUME_ID).get();
 			//THEN
 			assertEquals(expectedSideEffect, actualSideEffect);
@@ -543,13 +543,13 @@ class MongoUserControllerTest {
 			Set<String> expectedStandardResumesUserIds = standardResume.userIds().stream()
 					.filter(userId -> !userId.equals(basicUser.id()))
 					.collect(Collectors.toSet());
-			Resume expectedSideEffect1 = new Resume(STANDARD_RESUME_ID, standardResume.name(), expectedStandardResumesUserIds, standardResume.invitationSent(), standardResume.isPublished());
+			Resume expectedSideEffect1 = new Resume(STANDARD_RESUME_ID, standardResume.name(), standardResume.addressing(), expectedStandardResumesUserIds, standardResume.invitationSent(), standardResume.isPublished());
 			Resume actualSideEffect1 = resumeRepository.findById(STANDARD_RESUME_ID).get();
 
 			Set<String> expectedCreatedResumesUserIds = Stream
 					.concat(basicUserResume.userIds().stream(), Stream.of(updatedUser.id()))
 					.collect(Collectors.toSet());
-			Resume expectedSideEffect2 = new Resume(basicUserResume.id(), basicUserResume.name(), expectedCreatedResumesUserIds, basicUserResume.invitationSent(), basicUserResume.isPublished());
+			Resume expectedSideEffect2 = new Resume(basicUserResume.id(), basicUserResume.name(), basicUserResume.addressing(), expectedCreatedResumesUserIds, basicUserResume.invitationSent(), basicUserResume.isPublished());
 			Resume actualSideEffect2 = resumeRepository.findById(basicUserResume.id()).get();
 			// THEN
 			assertEquals(expectedSideEffect1, actualSideEffect1);
@@ -651,7 +651,7 @@ class MongoUserControllerTest {
 			Set<String> expectedStandardResumesUserIds = standardResume.userIds().stream()
 					.filter(userId -> !userId.equals(basicUser.id()))
 					.collect(Collectors.toSet());
-			Resume expectedSideEffect = new Resume(STANDARD_RESUME_ID, standardResume.name(), expectedStandardResumesUserIds, standardResume.invitationSent(), standardResume.isPublished());
+			Resume expectedSideEffect = new Resume(STANDARD_RESUME_ID, standardResume.name(), standardResume.addressing(), expectedStandardResumesUserIds, standardResume.invitationSent(), standardResume.isPublished());
 			Resume actualSideEffect = resumeRepository.findById(STANDARD_RESUME_ID).get();
 			// THEN
 			assertFalse(mongoUserRepository.existsById(basicUser.id()));
