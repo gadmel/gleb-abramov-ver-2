@@ -8,7 +8,7 @@ import LegalNotice from "../../pages/LegalNotice/LegalNotice";
 import Login from "../../pages/Login/Login";
 import Register from "../../pages/Register/Register";
 import Admin from "../../pages/Admin/Admin";
-import ResumePage from "../../pages/Resume/Resume";
+import ResumePage from "../../pages/Resume/ResumePage";
 
 axios.interceptors.request.use(
 	function (config) {

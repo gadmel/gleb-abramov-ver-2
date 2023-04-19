@@ -1,5 +1,5 @@
 import {User} from "../../services/authenticationService";
-import {Resume} from "../../services/adminService";
+import {Resume} from "../../services/resumeService";
 
 export type SelectOptionType = {
 	value: string
