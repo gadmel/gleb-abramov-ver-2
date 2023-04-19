@@ -39,7 +39,7 @@ function CollapsibleFormEditResume(props: Props) {
 
 	return (
 		<Layout title={"Resume for " + props.resume.name + " by Gleb Abramov"}>
-			<section id="resume">
+			<section id="resume" className="m-top">
 				<div className="full-screen-unit">
 					<CollapsibleForm expandedAndFixed
 										  formTitle={props.resume.name || ""}
