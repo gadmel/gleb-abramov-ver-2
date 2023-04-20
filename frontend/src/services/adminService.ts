@@ -47,17 +47,17 @@ class AdminService {
 			});
 	}
 
-	createResume(name: string, userIds: string[]) {
+	createResume(name: string, addressing: string, userIds: string[]) {
 		return axios
-			.post('/api/admin/resumes/create/', {name, userIds})
+			.post('/api/admin/resumes/create/', {name, addressing, userIds})
 			.then((response: { data: Resume }) => {
 				return response.data;
 			});
 	}
 
-	updateResume(id: string, name: string, userIds: string[]) {
+	updateResume(id: string, name: string, addressing: string, userIds: string[]) {
 		return axios
-			.put(`/api/admin/resumes/update/`, {id, name, userIds})
+			.put(`/api/admin/resumes/update/`, {id, name, addressing, userIds})
 			.then((response: { data: Resume }) => {
 				return response.data;
 			});

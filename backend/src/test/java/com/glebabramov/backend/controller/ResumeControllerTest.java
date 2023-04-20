@@ -48,9 +48,9 @@ class ResumeControllerTest {
 	String rawPassword = "password";
 	String testResumeId = "Some-resume-ID";
 	String testResumesAssignedUserId = "Some-user-ID";
-	Resume testResume = new Resume(testResumeId, "Company name", Set.of(testResumesAssignedUserId), false, false);
+	Resume testResume = new Resume(testResumeId, "Company name", "Hello, company!", Set.of(testResumesAssignedUserId), false, false);
 	MongoUser testResumeAssignedUser = new MongoUser(testResumesAssignedUserId, "Test resume's assigned user", encoder.encode(rawPassword), "BASIC", testResumeId);
-	Resume standardResume = new Resume("8c687299-9ab7-4f68-8fd9-3de3c521227e", "Standard company name", Set.of(), false, false);
+	Resume standardResume = new Resume("8c687299-9ab7-4f68-8fd9-3de3c521227e", "Standard company name", "Hello, company!", Set.of(), false, false);
 
 	@BeforeEach
 	void setUp() {
@@ -264,7 +264,7 @@ class ResumeControllerTest {
 			MongoUser expectedSideEffect1 = new MongoUser(basicUser.id(), basicUser.username(), basicUser.password(), basicUser.role(), testResumeId);
 			MongoUser actualSideEffect1 = mongoUserRepository.findById(basicUser.id()).get();
 			Set<String> oldResumesUserIds = new HashSet<>();
-			Resume expectedSideEffect2 = new Resume(testResume.id(), testResume.name(), oldResumesUserIds, testResume.invitationSent(), testResume.isPublished());
+			Resume expectedSideEffect2 = new Resume(testResume.id(), testResume.name(), testResume.addressing(), oldResumesUserIds, testResume.invitationSent(), testResume.isPublished());
 			Resume actualSideEffect2 = resumeRepository.findById(testResumeId).get();
 			// THEN
 			assertEquals(expectedSideEffect1, actualSideEffect1);
@@ -384,7 +384,7 @@ class ResumeControllerTest {
 			// GIVEN
 			MongoUser anotherTestUser = new MongoUser("Another-user-ID", testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), "Some-valid-resume-ID");
 			mongoUserRepository.save(anotherTestUser);
-			Resume testResume2 = new Resume("Some-valid-resume-ID", testResume.name(), Set.of("Another-user-ID"), testResume.invitationSent(), testResume.isPublished());
+			Resume testResume2 = new Resume("Some-valid-resume-ID", testResume.name(), testResume.addressing(), Set.of("Another-user-ID"), testResume.invitationSent(), testResume.isPublished());
 			resumeRepository.save(testResume);
 			resumeRepository.save(testResume2);
 			mongoUserRepository.save(testResumeAssignedUser);
@@ -411,7 +411,7 @@ class ResumeControllerTest {
 			MongoUser anotherTestUser = new MongoUser("Another-user-ID", testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), "Some-valid-resume-ID");
 			mongoUserRepository.save(anotherTestUser);
 			mongoUserRepository.save(testResumeAssignedUser);
-			Resume testResume2 = new Resume("Some-valid-resume-ID", testResume.name(), Set.of("Another-user-ID"), testResume.invitationSent(), testResume.isPublished());
+			Resume testResume2 = new Resume("Some-valid-resume-ID", testResume.name(), testResume.addressing(), Set.of("Another-user-ID"), testResume.invitationSent(), testResume.isPublished());
 			resumeRepository.save(testResume2);
 			resumeRepository.save(testResume);
 			resumeRepository.save(standardResume);
@@ -439,11 +439,11 @@ class ResumeControllerTest {
 			// THEN
 			MongoUser expectedSideEffect1 = new MongoUser(testResumesAssignedUserId, testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), standardResume.id());
 			MongoUser actualSideEffect1 = mongoUserRepository.findById(testResumesAssignedUserId).get();
-			Resume expectedSideEffect2 = new Resume(standardResume.id(), standardResume.name(), Set.of(testResumesAssignedUserId), standardResume.invitationSent(), standardResume.isPublished());
+			Resume expectedSideEffect2 = new Resume(standardResume.id(), standardResume.name(), standardResume.addressing(), Set.of(testResumesAssignedUserId), standardResume.invitationSent(), standardResume.isPublished());
 			Resume actualSideEffect2 = resumeRepository.findById(standardResume.id()).get();
 			MongoUser expectedSideEffect3 = new MongoUser(anotherTestUser.id(), anotherTestUser.username(), anotherTestUser.password(), anotherTestUser.role(), testResumeId);
 			MongoUser actualSideEffect3 = mongoUserRepository.findById(anotherTestUser.id()).get();
-			Resume expectedSideEffect4 = new Resume(testResume2.id(), testResume2.name(), Set.of(), testResume2.invitationSent(), testResume2.isPublished());
+			Resume expectedSideEffect4 = new Resume(testResume2.id(), testResume2.name(), testResume2.addressing(), Set.of(), testResume2.invitationSent(), testResume2.isPublished());
 			Resume actualSideEffect4 = resumeRepository.findById(testResume2.id()).get();
 			assertEquals(expectedSideEffect1, actualSideEffect1);
 			assertEquals(expectedSideEffect2, actualSideEffect2);
@@ -495,7 +495,7 @@ class ResumeControllerTest {
 		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin and the resume to delete does exist but one of the users who are assigned to it does not exist and thus cannot be unassigned from it")
 		void deleteResume_shouldThrow422UnprocessableEntity_ifOneOfTheUsersAssignedDoesNotExist() throws Exception {
 			// GIVEN
-			Resume resumeWithNonExistingUser = new Resume("Some-valid-ID", "Company name", Set.of("Some-non-existing-user-id"), false, false);
+			Resume resumeWithNonExistingUser = new Resume("Some-valid-ID", "Company name", "Hello, company!", Set.of("Some-non-existing-user-id"), false, false);
 			resumeRepository.save(resumeWithNonExistingUser);
 			// WHEN
 			mockMvc.perform(delete("/api/admin/resumes/delete/" + resumeWithNonExistingUser.id() + "/")
@@ -544,7 +544,7 @@ class ResumeControllerTest {
 			Optional<Resume> actual = resumeRepository.findById(testResumeId);
 			MongoUser expectedSideEffect1 = new MongoUser(testResumesAssignedUserId, testResumeAssignedUser.username(), testResumeAssignedUser.password(), testResumeAssignedUser.role(), standardResume.id());
 			MongoUser actualSideEffect1 = mongoUserRepository.findById(testResumesAssignedUserId).get();
-			Resume expectedSideEffect2 = new Resume(standardResume.id(), standardResume.name(), Set.of(testResumesAssignedUserId), standardResume.invitationSent(), standardResume.isPublished());
+			Resume expectedSideEffect2 = new Resume(standardResume.id(), standardResume.name(), standardResume.addressing(), Set.of(testResumesAssignedUserId), standardResume.invitationSent(), standardResume.isPublished());
 			Resume actualSideEffect2 = resumeRepository.findById(standardResume.id()).get();
 			assertEquals(expected, actual);
 			assertEquals(expectedSideEffect1, actualSideEffect1);

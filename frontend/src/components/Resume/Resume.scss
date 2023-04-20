@@ -166,7 +166,6 @@
 
 .dynamic,
 .contact {
-	//border: 2px solid $font-color--legal--value;
 	padding: 1em;
 	border-radius: 8px;
 	background: #333;
@@ -214,7 +213,7 @@
 			}
 			top: 0;
 			left: -2px;
-			border: 2px solid #5c6066; //$font-color--legal--value;
+			border: 2px solid #5c6066;
 			width: 40px;
 			height: 40px;
 			border-radius: 50%;
@@ -232,7 +231,6 @@
 
 	& .cv-position {
 		background: #333;
-		//border: 2px solid $font-color--legal--value;
 		@media (prefers-color-scheme: light) {
 			background: #eee;
 		}

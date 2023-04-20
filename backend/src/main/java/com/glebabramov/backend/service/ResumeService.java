@@ -40,7 +40,7 @@ public class ResumeService {
 	public Resume createResume(ResumeCreateRequest resume, Principal principal) {
 		authorisationService.isAuthorisedByRole(ADMIN_ROLE, "create resumes", principal);
 
-		Resume newResume = new Resume(idService.generateId(), resume.name(), resume.userIds(), false, false);
+		Resume newResume = new Resume(idService.generateId(), resume.name(), resume.addressing(), resume.userIds(), false, false);
 
 		resume.userIds().stream()
 				.map(usersToReassignResumeToId -> verificationService.userDoesExistById(usersToReassignResumeToId, true))
@@ -79,7 +79,7 @@ public class ResumeService {
 				})
 				.collect(Collectors.toSet());
 
-		Resume newResume = new Resume(incomingResume.id(), incomingResume.name(), incomingResume.userIds(), resumeToUpdate.invitationSent(), resumeToUpdate.isPublished());
+		Resume newResume = new Resume(incomingResume.id(), incomingResume.name(), incomingResume.addressing(), incomingResume.userIds(), resumeToUpdate.invitationSent(), resumeToUpdate.isPublished());
 
 		usersToUnassignResumeFrom.forEach(verifiedPair -> {
 			repository.save(verifiedPair.resume().unassignFromUser(verifiedPair.user().id()));

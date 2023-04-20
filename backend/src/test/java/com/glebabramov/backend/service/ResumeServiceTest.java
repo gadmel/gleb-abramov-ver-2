@@ -32,20 +32,22 @@ class ResumeServiceTest {
 	MongoUser adminUser = new MongoUser(ADMIN_USER_ID, "Admin's name", "Test password", "ADMIN", STANDARD_RESUME_ID);
 	MongoUserResponse adminUserResponse = adminUser.toResponseDTO();
 	MongoUser basicUser = new MongoUser(BASIC_USER_ID, "Basic user's name", "Test password", "BASIC", BASIC_USERS_ASSOCIATED_RESUME_ID);
-	Resume oldResume = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", Set.of(BASIC_USER_ID), false, false);
+	Resume oldResume = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", "Hello, company!", Set.of(BASIC_USER_ID), false, false);
 	MongoUserResponse basicUserResponse = basicUser.toResponseDTO();
 	String TEST_RESUMES_ID = "Some-Resume-ID";
-	Resume basicUsersResume = new Resume(TEST_RESUMES_ID, "Company name", Set.of(BASIC_USER_ID), false, false);
-	Resume standardResume = new Resume(STANDARD_RESUME_ID, "Company name", Set.of(ADMIN_USER_ID), false, false);
-	ResumeCreateRequest testResumeCreateRequest = new ResumeCreateRequest("Company name", Set.of(BASIC_USER_ID));
-	ResumeRequest testResumeRequest = new ResumeRequest(TEST_RESUMES_ID, "Company name", Set.of(BASIC_USER_ID));
+	Resume basicUsersResume = new Resume(TEST_RESUMES_ID, "Company name", "Hello, company!", Set.of(BASIC_USER_ID), false, false);
+	Resume standardResume = new Resume(STANDARD_RESUME_ID, "Company name", "Hello, company!", Set.of(ADMIN_USER_ID), false, false);
+	ResumeCreateRequest testResumeCreateRequest = new ResumeCreateRequest("Company name", "Hello, company!", Set.of(BASIC_USER_ID));
+	ResumeRequest testResumeRequest = new ResumeRequest(TEST_RESUMES_ID, "Company name", "Hello, company!", Set.of(BASIC_USER_ID));
 	String INVALID_USER_ID = "Some-Invalid-Resume-ID";
 	ResponseStatusException unauthorisedUserException = new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not logged in");
 	ResponseStatusException resumeNotFoundException = new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found");
 	ResponseStatusException nonExistentUserException = new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Secondary condition not met, because user with id " + INVALID_USER_ID + " does not exist");
+
 	ResponseStatusException associatedResumeDoesNotExistException(String associatedResumeId) {
 		return new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Secondary condition not met, because resume with id " + associatedResumeId + " does not exist");
 	}
+
 	ResponseStatusException forbiddenToViewResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to view all resumes");
 	ResponseStatusException forbiddenToCreateResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to create resumes");
 	ResponseStatusException forbiddenToUpdateResumesException = new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorised to update resumes");
@@ -67,7 +69,7 @@ class ResumeServiceTest {
 			Resume savedResume = invocation.getArgument(0);
 			when(resumeRepository.findById(savedResume.id())).thenReturn(Optional.of(savedResume));
 
-			return new Resume(savedResume.id(), savedResume.name(), savedResume.userIds(), savedResume.invitationSent(), savedResume.isPublished());
+			return new Resume(savedResume.id(), savedResume.name(), savedResume.addressing(), savedResume.userIds(), savedResume.invitationSent(), savedResume.isPublished());
 		});
 		when(idService.generateId()).thenReturn(TEST_RESUMES_ID);
 		resumeRepository.save(basicUsersResume);
@@ -158,7 +160,7 @@ class ResumeServiceTest {
 		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin but the resume's to create associated user does not exist")
 		void createResume_shouldThrow404NotFound_ifResumesToCreateAssociatedUserDoesNotExist() {
 			//GIVEN
-			ResumeCreateRequest resumeCreateRequest = new ResumeCreateRequest("Company name", Set.of(INVALID_USER_ID));
+			ResumeCreateRequest resumeCreateRequest = new ResumeCreateRequest("Company name", "Hello, company!", Set.of(INVALID_USER_ID));
 			//WHEN
 			ResponseStatusException expected = nonExistentUserException;
 			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.createResume(resumeCreateRequest, mockedPrincipal));
@@ -189,14 +191,14 @@ class ResumeServiceTest {
 			//GIVEN
 			mongoUserRepository.save(basicUser);
 			resumeRepository.save(oldResume);
-			ResumeCreateRequest createRequestWithAUserWhoHasAnExistingResume = new ResumeCreateRequest("Company name", Set.of(BASIC_USER_ID));
+			ResumeCreateRequest createRequestWithAUserWhoHasAnExistingResume = new ResumeCreateRequest("Company name", "Hello, company!", Set.of(BASIC_USER_ID));
 			//WHEN
-			Resume expected = new Resume(TEST_RESUMES_ID, "Company name", Set.of(basicUser.id()), false, false);
+			Resume expected = new Resume(TEST_RESUMES_ID, "Company name", "Hello, company!", Set.of(basicUser.id()), false, false);
 			Resume actual = resumeService.createResume(createRequestWithAUserWhoHasAnExistingResume, mockedPrincipal);
 			MongoUser expectedSideEffect1 = new MongoUser(basicUser.id(), basicUser.username(), basicUser.password(), basicUser.role(), TEST_RESUMES_ID);
 			MongoUser actualSideEffect1 = mongoUserRepository.findById(BASIC_USER_ID).get();
 			Set<String> oldResumesUserIds = oldResume.userIds().stream().filter(userId -> !userId.equals(BASIC_USER_ID)).collect(Collectors.toSet());
-			Resume expectedSideEffect2 = new Resume(oldResume.id(), oldResume.name(), oldResumesUserIds, oldResume.invitationSent(), oldResume.isPublished());
+			Resume expectedSideEffect2 = new Resume(oldResume.id(), oldResume.name(), oldResume.addressing(), oldResumesUserIds, oldResume.invitationSent(), oldResume.isPublished());
 			Resume actualSideEffect2 = resumeRepository.findById(oldResume.id()).get();
 			//THEN
 			assertEquals(expected, actual);
@@ -243,7 +245,7 @@ class ResumeServiceTest {
 		@DisplayName("...should throw 'Unprocessable Entity' (422) if the user is an admin but the resume's to update associated user does not exist")
 		void updateResume_shouldThrow422UnprocessableEntity_ifResumesToUpdateAssociatedUserDoesNotExist() {
 			//GIVEN
-			Resume resumeWithNonExistentUser = new Resume(TEST_RESUMES_ID, "Company name", Set.of(INVALID_USER_ID), false, false);
+			Resume resumeWithNonExistentUser = new Resume(TEST_RESUMES_ID, "Company name", "Hello, company!", Set.of(INVALID_USER_ID), false, false);
 			resumeRepository.save(resumeWithNonExistentUser);
 			//WHEN
 			ResponseStatusException expected = nonExistentUserException;
@@ -258,7 +260,7 @@ class ResumeServiceTest {
 		@DisplayName("...should throw 'Not Found' (404) if the resume's to update does not exist")
 		void updateResume_shouldThrow404NotFound_ifResumeToUpdateDoesNotExist() {
 			resumeRepository.save(basicUsersResume);
-			ResumeRequest resumeUpdateRequest = new ResumeRequest(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", Collections.emptySet());
+			ResumeRequest resumeUpdateRequest = new ResumeRequest(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", "Hello, company!", Collections.emptySet());
 			//WHEN
 			ResponseStatusException expected = resumeNotFoundException;
 			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.updateResume(resumeUpdateRequest, mockedPrincipal));
@@ -273,11 +275,11 @@ class ResumeServiceTest {
 		void updateResume_shouldThrow422UnprocessableEntity_ifResumesToUpdateAssociatedUsersPreviouslyAssignedResumeDoesNotExist() {
 			//GIVEN
 			resumeRepository.save(standardResume);
-			Resume resumeWithNonExistentUser = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", Set.of(BASIC_USER_ID), false, false);
+			Resume resumeWithNonExistentUser = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", "Hello, company!", Set.of(BASIC_USER_ID), false, false);
 			resumeRepository.save(resumeWithNonExistentUser);
 			MongoUser userWithNonExistentResume = new MongoUser(BASIC_USER_ID, "username", "password", "user", "non-existent-resume-id");
 			mongoUserRepository.save(userWithNonExistentResume);
-			ResumeRequest resumeUpdateRequest = new ResumeRequest(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", Collections.emptySet());
+			ResumeRequest resumeUpdateRequest = new ResumeRequest(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", "Hello, company!", Collections.emptySet());
 			//WHEN
 			ResponseStatusException expected = associatedResumeDoesNotExistException("non-existent-resume-id");
 			ResponseStatusException actual = assertThrows(ResponseStatusException.class, () -> resumeService.updateResume(resumeUpdateRequest, mockedPrincipal));
@@ -296,17 +298,17 @@ class ResumeServiceTest {
 			mongoUserRepository.save(basicUser);
 			mongoUserRepository.save(adminUser);
 			resumeRepository.save(oldResume);
-			ResumeRequest resumeUpdateRequest = new ResumeRequest(TEST_RESUMES_ID, "Company name", Set.of(ADMIN_USER_ID));
+			ResumeRequest resumeUpdateRequest = new ResumeRequest(TEST_RESUMES_ID, "Company name", "Hello, company!", Set.of(ADMIN_USER_ID));
 			//WHEN
-			Resume expected = new Resume(TEST_RESUMES_ID, "Company name", Set.of(ADMIN_USER_ID), false, false);
+			Resume expected = new Resume(TEST_RESUMES_ID, "Company name", "Hello, company!", Set.of(ADMIN_USER_ID), false, false);
 			Resume actual = resumeService.updateResume(resumeUpdateRequest, mockedPrincipal);
 			MongoUser expectedSideEffect1 = new MongoUser(BASIC_USER_ID, basicUser.username(), basicUser.password(), basicUser.role(), STANDARD_RESUME_ID);
 			MongoUser actualSideEffect1 = mongoUserRepository.findById(BASIC_USER_ID).get();
 			MongoUser expectedSideEffect2 = new MongoUser(ADMIN_USER_ID, adminUser.username(), adminUser.password(), adminUser.role(), TEST_RESUMES_ID);
 			MongoUser actualSideEffect2 = mongoUserRepository.findById(ADMIN_USER_ID).get();
-			Resume expectedSideEffect4 = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, oldResume.name(), Collections.emptySet(), oldResume.invitationSent(), oldResume.isPublished());
+			Resume expectedSideEffect4 = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, oldResume.name(), oldResume.addressing(), Collections.emptySet(), oldResume.invitationSent(), oldResume.isPublished());
 			Resume actualSideEffect4 = resumeRepository.findById(BASIC_USERS_ASSOCIATED_RESUME_ID).get();
-			Resume expectedSideEffect3 = new Resume(STANDARD_RESUME_ID, standardResume.name(), Set.of(BASIC_USER_ID), standardResume.invitationSent(), standardResume.isPublished());
+			Resume expectedSideEffect3 = new Resume(STANDARD_RESUME_ID, standardResume.name(), standardResume.addressing(), Set.of(BASIC_USER_ID), standardResume.invitationSent(), standardResume.isPublished());
 			Resume actualSideEffect3 = resumeRepository.findById(STANDARD_RESUME_ID).get();
 			//THEN
 			assertEquals(expected, actual);
@@ -369,7 +371,7 @@ class ResumeServiceTest {
 		@DisplayName("...should return 'Unprocessable Entity' (422) if the user is an admin and the resume to delete does exist but one of the users who are assigned to it does not exist and thus cannot be unassigned from it")
 		void deleteResume_shouldReturn422UnprocessableEntity_ifOneOfTheUsersAssignedDoesNotExist() {
 			//GIVEN
-			Resume resumeWithNonExistentUser = new Resume(TEST_RESUMES_ID, "Company name", Set.of(INVALID_USER_ID), false, false);
+			Resume resumeWithNonExistentUser = new Resume(TEST_RESUMES_ID, "Company name", "Hello, company!", Set.of(INVALID_USER_ID), false, false);
 			resumeRepository.save(resumeWithNonExistentUser);
 			//WHEN
 			ResponseStatusException expected = nonExistentUserException;
@@ -384,12 +386,12 @@ class ResumeServiceTest {
 		@DisplayName("...should delete the resume and reassign the standard resume to the users who were assigned to the deleted one, return 'OK' (200) and the deleted resume if user is an admin, the resume to delete exists and all users who were assigned to it exist")
 		void deleteResume_shouldDeleteResumeAndReassignTheStandardToItsUsers_andReturnIt_ifResumeAndItsUsersExistAndUserIsAdmin() {
 			//GIVEN
-			Resume standardResume = new Resume(STANDARD_RESUME_ID, "Standard resume", Set.of(ADMIN_USER_ID), false, false);
+			Resume standardResume = new Resume(STANDARD_RESUME_ID, "Standard resume", "Hello, company!", Set.of(ADMIN_USER_ID), false, false);
 			resumeRepository.save(standardResume);
 			mongoUserRepository.save(adminUser);
 			MongoUser testUser = new MongoUser(BASIC_USER_ID, "Test user", "password", "BASIC", BASIC_USERS_ASSOCIATED_RESUME_ID);
 			mongoUserRepository.save(testUser);
-			Resume resumeToDelete = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", Set.of(BASIC_USER_ID), false, false);
+			Resume resumeToDelete = new Resume(BASIC_USERS_ASSOCIATED_RESUME_ID, "Company name", "Hello, company!", Set.of(BASIC_USER_ID), false, false);
 			resumeRepository.save(resumeToDelete);
 			//WHEN
 			Resume expected = resumeToDelete;

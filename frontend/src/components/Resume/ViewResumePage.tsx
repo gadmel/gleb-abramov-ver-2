@@ -63,6 +63,7 @@ function ViewResumePage(props: Props) {
 					<h2>Profile</h2>
 					<div className="dynamic">
 						<p>{props.resume?.name}</p>
+						<p>{props.resume?.addressing}</p>
 					</div>
 
 					<div className="qualification">

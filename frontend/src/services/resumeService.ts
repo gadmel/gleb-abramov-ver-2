@@ -3,6 +3,7 @@ import axios from 'axios';
 export interface Resume {
 	id: string;
 	name: string;
+	addressing: string;
 	userIds: string[];
 	invitationSent: boolean;
 	isPublished: boolean;

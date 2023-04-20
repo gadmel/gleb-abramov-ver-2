@@ -4,7 +4,7 @@
 
 This is the repository of the capstone project of the [Java Development Bootcamp](https://www.neuefische.de/bootcamp/java-development) by [neuefische](https://www.neuefische.de/) created by [Gleb Abramov](https://github.com/gadmel).<br>
 
-The project is a web application built with [Vite](https://vitejs.dev/), [Typescript](https://www.typescriptlang.org/), [React](https://reactjs.org/) and [Sass](https://sass-lang.com/) on the frontend, and with [Maven](https://maven.apache.org/) [Java](https://www.java.com/en/) and [Spring Boot](https://spring.io/projects/spring-boot) on the backend.
+The project is a web application built with [Vite](https://vitejs.dev/), [Typescript](https://www.typescriptlang.org/), [React](https://reactjs.org/) and [Sass](https://sass-lang.com/) on the frontend, and with [Maven](https://maven.apache.org/) [Java](https://www.java.com/en/), [Spring Boot](https://spring.io/projects/spring-boot) and [MongoDB](https://www.mongodb.com/) on the backend.
 
 The capstone project as itself is intended to be an extended Developer Homepage with a secured CV access.
 
