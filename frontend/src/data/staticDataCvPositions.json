@@ -1,0 +1,63 @@
+[
+	{
+		"company": "neue fische - School and Pool for Digital Talent",
+		"logo": {
+			"label": "neue fische - School and Pool for Digital Talent",
+			"src": "https://media.licdn.com/dms/image/C4E0BAQFcEibYsxuiMw/company-logo_200_200/0/1653913018733?e=1689811200&v=beta&t=-bAfdOCO5hphddkxCm7KoZcvETPSf_wFgaLjvG-tzH8"
+		},
+		"jobTitle": "Trainee Java Full Stack Developer",
+		"location": "Hamburg, Germany",
+		"period": "January 2023 - April 2023",
+		"description": "I'm happy to rejoin the fabulous neuefische, to take the opportunity to attend their Java-and-Spring-Bootcamp and solidify my OOP-Skill in another strictly typed language. Four intensive yet joyful months of full-time programming in order to progress profoundly into full-stack development. My capstone project in this Bootcamp is the given website you're currently visiting.",
+		"skills": ["Java", "Spring Framework", "Spring Boot", "JSON", "Software development", "Web development", "Git", "Agile development", "Backend Development", "Full-Stack-Development"],
+		"style": {
+			"jobTitleClassName": "neuefische"
+		}
+	},
+	{
+		"company": "CarbonStack",
+		"logo": {
+			"label": "CarbonStack",
+			"src": "https://media.licdn.com/dms/image/C4D0BAQEWsRRV7b_JiA/company-logo_200_200/0/1648826731914?e=1689811200&v=beta&t=3sePkLKvqwl0o_Rux-41dqC67lE1X7DiUZd2XLBq4DI"
+		},
+		"jobTitle": "Software Developer",
+		"location": "Hamburg, Germany",
+		"period": "June 2022 - October 2022",
+		"description": "- Responsibility for further development and maintenance of the CarbonStack platform\n- Design and implementation of React-based components and pages with extensive CSS and Tailwind design integration\n- Formation of a MongoDB-based backend database and development of a corresponding REST-API\n- Development of a project database for geoinformation storage\n- Database objects' processing in a React application",
+		"skills": ["Asana", "Postman (API)", "Tailwind", "REST-API", "Object-oriented programming (OOP)", "JSON", "Frontend-Development", "JavaScript", "React", "HTML", "CSS3", "Node.js", "React.js", "Git", "MongoDB", "vscode", "HTML5", "Agile Development", "Backend-Development", "Full-Stack-Development", "Express.js", "Prop-Types"],
+		"style": {
+			"jobTitleClassName": "carbonstack"
+		}
+	},
+	{
+		"company": "CleverPush",
+		"logo": {
+			"label": "CleverPush",
+			"src": "https://media.licdn.com/dms/image/C4E0BAQGVBIc0u_Xyjg/company-logo_200_200/0/1671813737957?e=1689811200&v=beta&t=OvQL146H-GY3RgQl_Iv2DUfa2hp5lpz5CmIppIFPwWs"
+		},
+		"jobTitle": "Junior Software Engineer",
+		"location": "Hamburg, Germany",
+		"period": "September 2021 - July 2022",
+		"description": "Not yet ready",
+		"skills": ["JIRA", "Postman (API)", "MeteorJS", "REST-API", "Object-oriented programming (OOP)", "TypeScript", "JSON", "Frontend-Development", "JavaScript", "React", "HTML", "CSS3", "Node.js", "React.js", "Git", "SASS", "styled-components", "MongoDB", "Bootstrap", "vscode", "HTML5", "Agile Software Development", "Backend-Development", "Full-Stack-Development", "Express.js", "Prop-Types"],
+		"style": {
+			"jobTitleClassName": "cleverpush"
+		}
+	},
+	{
+		"company": "neue fische - School and Pool for Digital Talent",
+		"logo": {
+			"label": "neue fische - School and Pool for Digital Talent",
+			"src": "https://media.licdn.com/dms/image/C4E0BAQFcEibYsxuiMw/company-logo_200_200/0/1653913018733?e=1689811200&v=beta&t=-bAfdOCO5hphddkxCm7KoZcvETPSf_wFgaLjvG-tzH8"
+		},
+		"jobTitle": "Trainee Web Developer",
+		"location": "Hamburg, Germany",
+		"period": "January 2020 - April 2023",
+		"description": "Intensive full-time coding bootcamp.\n \n 540 hours of programming practice, including the development of an app as a final thesis (capstone project)\n \n Applied technologies and tools: JavaScript ES2020, React latest, HTML5, CSS3, Bootstrap, Storybook, Cypress, Nodejs, Express, MongoDB, mongoose, Postman, Shell, npm, git workflow.",
+		"skills": ["Postman (API)", "REST-API", "Cypress.io", "Java", "Spring Framework", "Spring Boot", "JSON", "Frontend-Development", "JavaScript", "React", "HTML", "CSS3", "Node.js", "React.js", "Git", "SASS", "styled-components", "Firebase", "MongoDB", "Bootstrap", "vscode", "HTML5", "Jest", "Agile Software Development", "Backend-Development", "Full-Stack-Development", "Express.js", "Cypress", "Prop-Types", "Storybook"],
+		"style": {
+			"jobTitleClassName": "neuefische"
+		}
+	}
+
+]
